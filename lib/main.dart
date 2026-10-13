@@ -1,24 +1,18 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:material_ui/material_ui.dart';
 
-import 'app/tema.dart';
+import 'app/eco_reporte_app.dart';
+import 'data/repositorio_simulado.dart';
 
-/// TEC-01: proyecto creado y migrado a material_ui. La primera pantalla
-/// real llega con la prueba técnica del Sprint 1.
-void main() => runApp(const EcoReporteApp());
-
-class EcoReporteApp extends StatelessWidget {
-  const EcoReporteApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EcoReporte',
-      debugShowCheckedModeBanner: false,
-      theme: temaClaro(),
-      darkTheme: temaOscuro(),
-      home: const Scaffold(
-        body: Center(child: Text('EcoReporte')),
-      ),
-    );
-  }
+void main() {
+  // Sprint 1 · INV-04: datos simulados. TEC-02 (Sprint 2) lo cambia por el
+  // repositorio SQLite sin tocar ninguna pantalla.
+  final RepositorioSimulado repositorio = RepositorioSimulado();
+  runApp(
+    EcoReporteApp(
+      repositorio: repositorio,
+      // El selector de escenario solo existe en modo de desarrollo.
+      simulado: kDebugMode ? repositorio : null,
+    ),
+  );
 }
