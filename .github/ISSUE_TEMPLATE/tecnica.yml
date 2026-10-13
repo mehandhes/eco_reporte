@@ -1,0 +1,22 @@
+name: Tarea técnica
+description: Trabajo necesario que el usuario no ve (proyecto, base de datos, distribución)
+title: "TEC-XX: "
+labels: ["tecnica"]
+body:
+  - type: textarea
+    id: que
+    attributes:
+      label: Qué hay que hacer
+    validations:
+      required: true
+  - type: textarea
+    id: hecho
+    attributes:
+      label: Cómo sabremos que está hecha
+      value: |
+        - [ ]
+  - type: textarea
+    id: historias
+    attributes:
+      label: Historias que la necesitan
+      placeholder: HU-03, HU-04

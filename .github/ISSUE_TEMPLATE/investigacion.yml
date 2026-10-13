@@ -1,0 +1,21 @@
+name: Investigación
+description: Trabajo del sprint que no es historia ni código (validación, documento, prueba técnica con límite de tiempo)
+title: "INV-XX: "
+labels: ["investigacion"]
+body:
+  - type: textarea
+    id: pregunta
+    attributes:
+      label: Qué queremos saber o producir
+    validations:
+      required: true
+  - type: input
+    id: limite
+    attributes:
+      label: Límite de tiempo
+      placeholder: 2 horas
+  - type: textarea
+    id: resultado
+    attributes:
+      label: Dónde quedará el resultado
+      placeholder: docs/requisitos.md, un comentario en este issue, un PR...
