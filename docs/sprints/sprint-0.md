@@ -45,3 +45,18 @@
 - [x] Plantilla `.github/ISSUE_TEMPLATE/historia.yml` en el repositorio.
 - [x] Definición del Flujo de Trabajo y DoD de Exploración escritas.
 - [x] Objetivo del Sprint 1 escrito y sus elementos en «Listo».
+
+## Sprint Review · al inicio de la Sesión B de la semana 4
+
+Review **cruzada**: el PO presentó el tablero a otro equipo durante seis minutos (Objetivo del Producto, MoSCoW con su
+«fuera del alcance» y el backlog ordenado). Pregunta más útil del otro equipo: «¿qué historia no entendí?». Señalaron
+**HU-03** («¿guardar y enviar son lo mismo?») y **HU-07** («¿a dónde se sube?»): candidatas al refinamiento.
+
+**Métricas de línea de base:** throughput 0 · elemento en curso de mayor edad: ninguno.
+
+## Retrospectiva
+
+- **Conservar:** estimar con voto simultáneo; salieron dudas que nadie había dicho en voz alta.
+- **Cambiar:** el Daily asíncrono solo lo respondieron dos de cuatro.
+- **Experimento del Sprint 1:** el Daily se escribe lunes, miércoles y viernes antes de las 8 p. m., con un formato fijo
+  de tres líneas (qué hice, qué haré, qué me frena). **Sirvió si** los cuatro escriben al menos dos de los tres días.

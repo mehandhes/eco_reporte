@@ -1,6 +1,7 @@
 # Visión y alcance de EcoReporte
 
 > Sprint 0 · semana 3 · Paso 1 y Paso 2 de la guía-taller del Sprint 0.
+> Actualizado en el Sprint 1 (semana 4): MoSCoW tras el corte del MVP.
 
 ## Problema y ODS
 
@@ -44,6 +45,15 @@ Va también en la descripción del proyecto de GitHub Projects.
 
 **Revisión contra el Hito 3** (API + persistencia + función del dispositivo): cámara y GPS (Must), SQLite (Must, HU-03)
 y API de sincronización (Should, HU-07). Cubierto.
+
+### Cambios del Sprint 1
+
+| Cambio | Por qué |
+|---|---|
+| **HU-12 · Referencia del lugar** entra como Should y sube a **Must** | El mapa de experiencia mostró que el lote no tiene nomenclatura; y el escenario «permiso de ubicación denegado» de HU-02 no se puede cumplir sin ella |
+| **HU-10 · Compartir por WhatsApp** sube de Could a **Must** | Sin ella la actividad «Hacer que llegue a alguien» quedaba vacía sobre la línea del MVP. Es la forma más barata (2 pts) de cerrar el recorrido |
+| **HU-07** se parte en HU-07 (subir con un botón) y **HU-13** (subida automática) | Valía 8 puntos y mezclaba dos caminos (corte P de SPIDR) |
+| **HU-03** se reescribe: «guardar en mi teléfono» (5 → 3 pts) | Mezclaba guardar en el teléfono con enviar a la nube, que es HU-07 |
 
 
 ## Fuera del alcance este semestre

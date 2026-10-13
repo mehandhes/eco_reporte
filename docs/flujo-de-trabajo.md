@@ -16,6 +16,12 @@ Equipo de cuatro integrantes.
 | **En dispositivo** | PR aprobado por otra persona; APK de la rama instalado en un Android físico. | 2 |
 | **Hecho** | Cumple la Definición de Terminado y el PR está fusionado. | — |
 
+**Política añadida en el Sprint 1 · elementos de investigación (INV):** esperan en «Backlog» con el campo Sprint puesto
+(la vista «Sprint actual» los muestra igual) y pasan a «En desarrollo» cuando alguien los toma. **No pasan por «En
+dispositivo»**: de «En revisión», donde otra persona lee el resultado, van a «Hecho».
+
+**Las historias Must se quedan en «Listo»** durante la fase de Exploración. Llegan a «Hecho» cuando estén construidas y
+probadas en un teléfono, desde la semana 6.
 
 ## El resto de la definición
 
@@ -59,3 +65,4 @@ Una historia está **Hecha** cuando:
 - [ ] Toda lista modela sus **cuatro estados**: cargando, vacío, error y con datos.
 - [ ] Si usa un permiso, maneja el caso de **permiso denegado**.
 - [ ] Toda área táctil mide al menos **48 dp**.
+- [ ] El texto tiene un contraste de 4,5:1 o más. *(Añadido en el Sprint 1, requisito de calidad RC-02.)*
