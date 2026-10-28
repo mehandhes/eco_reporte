@@ -100,6 +100,7 @@ class RepositorioSimulado implements ReporteRepository {
         latitud: 7.0600 + (i % 50) / 10000,
         longitud: -73.8500 - (i % 40) / 10000,
         precisionMetros: 5.0 + i % 70,
+        categoria: Categoria.values[i % Categoria.values.length],
       );
     });
   }
@@ -112,6 +113,7 @@ class RepositorioSimulado implements ReporteRepository {
         id: 3,
         fecha: _ahora.subtract(const Duration(days: 4, hours: 2)),
         referencia: 'Detrás del salón comunal, junto a la cancha de microfútbol',
+        categoria: Categoria.voluminosos,
         latitud: 7.06612,
         longitud: -73.85231,
         precisionMetros: 12,
@@ -120,6 +122,7 @@ class RepositorioSimulado implements ReporteRepository {
         id: 1,
         fecha: _ahora.subtract(const Duration(hours: 3)),
         referencia: 'Lote de la esquina de la calle 52, frente a la tienda',
+        categoria: Categoria.domestica,
         latitud: 7.06531,
         longitud: -73.85472,
         precisionMetros: 8,
@@ -134,6 +137,7 @@ class RepositorioSimulado implements ReporteRepository {
         id: 2,
         fecha: _ahora.subtract(const Duration(days: 1, hours: 5)),
         referencia: 'Separador de la avenida, junto al paradero de buses',
+        categoria: Categoria.escombros,
         latitud: 7.06398,
         longitud: -73.85610,
         precisionMetros: 15,
@@ -150,6 +154,7 @@ class RepositorioSimulado implements ReporteRepository {
         id: 4,
         fecha: _ahora.subtract(const Duration(days: 7, hours: 1)),
         referencia: 'Orilla del caño, bajando por la carrera 36',
+        categoria: Categoria.poda,
         latitud: 7.06244,
         longitud: -73.85155,
         // Peor que 50 m: el detalle muestra «Ubicación aproximada».

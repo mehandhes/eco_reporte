@@ -5,6 +5,15 @@ const List<String> _meses = <String>[
   'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
 ];
 
+const List<String> _mesesLargos = <String>[
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+/// «octubre de 2026».
+String formatearMes(DateTime mes) =>
+    '${_mesesLargos[mes.month - 1]} de ${mes.year}';
+
 /// «13 oct 2026».
 String formatearFecha(DateTime fecha) =>
     '${fecha.day} ${_meses[fecha.month - 1]} ${fecha.year}';

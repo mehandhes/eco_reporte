@@ -283,4 +283,36 @@ void main() {
       expect(guardado.referencia, isEmpty, reason: 'con GPS, la referencia es opcional');
     });
   });
+
+  group('HU-06 · Tipo de residuo', () {
+    test('Empieza sin categoría y se puede guardar así', () async {
+      await llenar();
+
+      final Reporte? guardado = await vm.guardar();
+
+      expect(vm.categoria, isNull);
+      expect(guardado!.categoria, isNull);
+    });
+
+    test('Tocar otra la reemplaza; tocar la misma la quita', () {
+      vm.alternarCategoria(Categoria.escombros);
+      expect(vm.categoria, Categoria.escombros);
+
+      vm.alternarCategoria(Categoria.llantas);
+      expect(vm.categoria, Categoria.llantas);
+
+      vm.alternarCategoria(Categoria.llantas);
+      expect(vm.categoria, isNull);
+    });
+
+    test('El reporte guardado lleva la categoría elegida', () async {
+      await llenar();
+      vm.alternarCategoria(Categoria.poda);
+
+      final Reporte? guardado = await vm.guardar();
+
+      expect(guardado!.categoria, Categoria.poda);
+      expect(repositorio.reportes.single.categoria, Categoria.poda);
+    });
+  });
 }

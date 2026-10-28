@@ -173,4 +173,82 @@ void main() {
     await nuevo.marcarCompartido(heredado.id, DateTime(2026, 11, 3));
     expect((await nuevo.obtenerTodos()).single.fueCompartido, isTrue);
   });
+
+  test('HU-06: la categoría se guarda y se lee', () async {
+    await repo.guardar(
+      BorradorReporte(
+        fecha: DateTime(2026, 11, 3),
+        referencia: 'Lote de la 52',
+        rutaFoto: '/datos/fotos/1.jpg',
+        categoria: Categoria.voluminosos,
+      ),
+    );
+    await repo.guardar(borrador(DateTime(2026, 11, 2), 'sin tipo'));
+
+    final List<Reporte> todos = await repo.obtenerTodos();
+    expect(todos.first.categoria, Categoria.voluminosos);
+    expect(todos.last.categoria, isNull);
+  });
+
+  test('HU-06: un código de categoría desconocido se lee como «sin categoría»', () {
+    final Reporte r = Reporte.desdeFila(<String, Object?>{
+      'id': 1,
+      'fecha_ms': DateTime(2026, 11, 3).millisecondsSinceEpoch,
+      'referencia': 'a',
+      'categoria': 'una-que-no-existe',
+    });
+
+    expect(r.categoria, isNull);
+  });
+
+  test('migración 2 → 3: los reportes del Sprint 3 sobreviven y quedan sin categoría', () async {
+    final Directory carpeta = await Directory.systemTemp.createTemp('eco_db_');
+    addTearDown(() => carpeta.delete(recursive: true));
+    final String ruta = p.join(carpeta.path, 'eco_reporte.db');
+
+    // Una base como la que dejó la versión 1.0.0 de la app (esquema 2).
+    final Database vieja = await databaseFactoryFfi.openDatabase(
+      ruta,
+      options: OpenDatabaseOptions(
+        version: 2,
+        onCreate: (Database db, int version) async {
+          await db.execute('''
+            CREATE TABLE reportes (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              fecha_ms INTEGER NOT NULL,
+              referencia TEXT NOT NULL DEFAULT '',
+              latitud REAL, longitud REAL, precision_m REAL, ruta_foto TEXT,
+              compartido_ms INTEGER
+            )
+          ''');
+          await db.insert('reportes', <String, Object?>{
+            'fecha_ms': DateTime(2026, 10, 20).millisecondsSinceEpoch,
+            'referencia': 'del sprint 3',
+            'ruta_foto': '/app/fotos/1.jpg',
+            'compartido_ms': DateTime(2026, 10, 21).millisecondsSinceEpoch,
+          });
+        },
+      ),
+    );
+    await vieja.close();
+
+    final RepositorioSqlite nuevo =
+        RepositorioSqlite(fabrica: databaseFactoryFfi, ruta: ruta);
+    addTearDown(nuevo.cerrar);
+
+    final Reporte heredado = (await nuevo.obtenerTodos()).single;
+    expect(heredado.referencia, 'del sprint 3');
+    expect(heredado.fueCompartido, isTrue);
+    expect(heredado.categoria, isNull);
+
+    await nuevo.guardar(
+      BorradorReporte(
+        fecha: DateTime(2026, 11, 4),
+        referencia: 'nuevo',
+        rutaFoto: '/app/fotos/2.jpg',
+        categoria: Categoria.llantas,
+      ),
+    );
+    expect((await nuevo.obtenerTodos()).first.categoria, Categoria.llantas);
+  });
 }

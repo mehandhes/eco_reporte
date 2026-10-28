@@ -13,9 +13,11 @@ void main() {
   late RepositorioSimulado repositorio;
   late ServicioCompartirFalso compartir;
   late AlmacenFotosFalso almacen;
+  late ServicioExportarFalso exportar;
   late ReportesViewModel vm;
 
   setUp(() {
+    exportar = ServicioExportarFalso();
     compartir = ServicioCompartirFalso();
     almacen = AlmacenFotosFalso();
     repositorio = RepositorioSimulado(
@@ -26,6 +28,7 @@ void main() {
       repositorio,
       compartir: compartir,
       almacen: almacen,
+      exportar: exportar,
       reloj: () => DateTime(2026, 11, 9, 18),
     );
   });
@@ -116,6 +119,48 @@ void main() {
     });
   });
 
+  group('HU-09 · Exportar el listado del mes', () {
+    test('los meses con reportes, del más reciente al más antiguo', () async {
+      await vm.cargar();
+
+      // Los ejemplos van del 13 oct 2026 hacia atrás, hasta el 23 sep.
+      expect(vm.mesesExportables, <DateTime>[DateTime(2026, 10), DateTime(2026, 9)]);
+      expect(vm.cuantosEn(DateTime(2026, 10)), 5);
+      expect(vm.cuantosEn(DateTime(2026, 9)), 1);
+    });
+
+    test('exporta solo el mes elegido, con su nombre de archivo', () async {
+      await vm.cargar();
+
+      final ResultadoCompartir r = await vm.exportarMes(DateTime(2026, 9));
+
+      expect(r, ResultadoCompartir.compartido);
+      expect(exportar.veces, 1);
+      expect(exportar.nombreArchivo, 'ecoreporte_2026-09.csv');
+      expect(exportar.texto, contains('septiembre de 2026 · 1 reporte '));
+      final List<String> lineas = exportar.contenido!.trim().split('\r\n');
+      expect(lineas, hasLength(2), reason: 'encabezado + 1 reporte');
+      expect(lineas[1], contains('Entrada del callejón'));
+    });
+
+    test('un mes sin reportes no produce un archivo vacío', () async {
+      await vm.cargar();
+
+      final ResultadoCompartir r = await vm.exportarMes(DateTime(2026, 1));
+
+      expect(r, ResultadoCompartir.cancelado);
+      expect(exportar.veces, 0);
+    });
+
+    test('si el teléfono no puede compartir, se informa como fallido', () async {
+      await vm.cargar();
+      exportar.resultado = ResultadoCompartir.fallido;
+
+      expect(await vm.exportarMes(DateTime(2026, 10)), ResultadoCompartir.fallido);
+      expect(vm.exportando, isFalse);
+    });
+  });
+
   group('TEC-05 · Borrar un reporte', () {
     test('desaparece de la lista y no vuelve al recargar', () async {
       await vm.cargar();
@@ -137,8 +182,12 @@ void main() {
           rutaFoto: '/app/fotos/1.jpg',
         ),
       );
-      final ReportesViewModel otro =
-          ReportesViewModel(conFoto, compartir: compartir, almacen: almacen);
+      final ReportesViewModel otro = ReportesViewModel(
+        conFoto,
+        compartir: compartir,
+        almacen: almacen,
+        exportar: exportar,
+      );
       addTearDown(otro.dispose);
       await otro.cargar();
 

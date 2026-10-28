@@ -226,6 +226,21 @@ class NuevoReporteViewModel extends ChangeNotifier {
     return tieneFoto && !faltaReferencia;
   }
 
+  // ---------------------------------------------------------------- HU-06
+  Categoria? _categoria;
+
+  /// El tipo de residuo elegido, o nulo. Es opcional: quien no sabe
+  /// clasificarlo igual puede reportar (RC-01 · menos de un minuto).
+  Categoria? get categoria => _categoria;
+
+  /// Tocar una categoría la elige y reemplaza la anterior; tocar la que ya
+  /// estaba elegida la quita.
+  void alternarCategoria(Categoria tocada) {
+    if (_guardando) return;
+    _categoria = _categoria == tocada ? null : tocada;
+    _avisar();
+  }
+
   // ---------------------------------------------------------------- HU-03
   bool _guardando = false;
   String? _errorGuardado;
@@ -261,6 +276,7 @@ class NuevoReporteViewModel extends ChangeNotifier {
           latitud: _latitud,
           longitud: _longitud,
           precisionMetros: _precision,
+          categoria: _categoria,
         ),
       );
       // Queda en «guardando» a propósito: la pantalla se va a cerrar y

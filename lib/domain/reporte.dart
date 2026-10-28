@@ -1,3 +1,7 @@
+import 'categoria.dart';
+
+export 'categoria.dart';
+
 /// Un reporte ciudadano de un punto crítico de residuos, ya guardado.
 ///
 /// Es inmutable: nada cambia por debajo mientras la interfaz lo dibuja.
@@ -13,6 +17,7 @@ class Reporte {
     this.precisionMetros,
     this.rutaFoto,
     this.compartidoEn,
+    this.categoria,
   });
 
   /// Lo asigna SQLite al guardar. Un reporte sin id todavía es un
@@ -41,6 +46,10 @@ class Reporte {
   /// compartió.
   final DateTime? compartidoEn;
 
+  /// Qué tipo de residuo es (HU-06). Nula si la vecina no eligió ninguna o
+  /// si el reporte es de antes del Sprint 5.
+  final Categoria? categoria;
+
   bool get fueCompartido => compartidoEn != null;
 
   /// Copia del reporte marcada como compartida en [cuando].
@@ -53,6 +62,7 @@ class Reporte {
         precisionMetros: precisionMetros,
         rutaFoto: rutaFoto,
         compartidoEn: cuando,
+        categoria: categoria,
       );
 
   bool get tieneUbicacion => latitud != null && longitud != null;
@@ -79,6 +89,7 @@ class Reporte {
           longitud: longitud,
           precisionMetros: precisionMetros,
           rutaFoto: rutaFoto,
+          categoria: categoria,
         ),
         'compartido_ms': compartidoEn?.millisecondsSinceEpoch,
       };
@@ -97,6 +108,9 @@ class Reporte {
         final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
         _ => null,
       },
+      // Un código que esta versión no conoce se lee como «sin categoría»:
+      // nunca rompe la lista.
+      categoria: Categoria.desdeCodigo(fila['categoria']),
     );
   }
 
@@ -108,6 +122,7 @@ class Reporte {
     double? longitud,
     double? precisionMetros,
     String? rutaFoto,
+    Categoria? categoria,
   }) =>
       <String, Object?>{
         'fecha_ms': fecha.millisecondsSinceEpoch,
@@ -116,6 +131,7 @@ class Reporte {
         'longitud': longitud,
         'precision_m': precisionMetros,
         'ruta_foto': rutaFoto,
+        'categoria': categoria?.codigo,
       };
 }
 
@@ -130,6 +146,7 @@ class BorradorReporte {
     this.latitud,
     this.longitud,
     this.precisionMetros,
+    this.categoria,
   });
 
   final DateTime fecha;
@@ -140,6 +157,7 @@ class BorradorReporte {
   final double? latitud;
   final double? longitud;
   final double? precisionMetros;
+  final Categoria? categoria;
 
   Map<String, Object?> aFila() => Reporte.camposDeFila(
         fecha: fecha,
@@ -148,6 +166,7 @@ class BorradorReporte {
         longitud: longitud,
         precisionMetros: precisionMetros,
         rutaFoto: rutaFoto,
+        categoria: categoria,
       );
 
   /// El reporte que resulta de guardarlo con el id que asignó la base.
@@ -159,5 +178,6 @@ class BorradorReporte {
         longitud: longitud,
         precisionMetros: precisionMetros,
         rutaFoto: rutaFoto,
+        categoria: categoria,
       );
 }

@@ -6,8 +6,8 @@ Proyecto modelo del curso *Desarrollo de Aplicaciones Móviles* (Ingeniería Inf
 cómo un equipo lleva un producto de la idea al APK con el marco del curso (Scrumban con fases de Mobile-D) y **Flutter**.
 Es un ejemplo para estudiar, no para copiar: su problema es otro.
 
-> **Estado: versión 1.0.0, fin del Sprint 4 (cierre del curso).** Las siete historias Must del MVP están construidas,
-> con 73 pruebas automáticas, revisión de seguridad y build de release. Falta lo que solo puede hacer un equipo de
+> **Estado: versión 1.1.0, Sprint 5 (primer incremento después del MVP).** Las siete historias Must del MVP más dos
+> Should (HU-06 y HU-09) están construidas, con 98 pruebas automáticas, revisión de seguridad y build de release. Falta lo que solo puede hacer un equipo de
 > verdad: probar cada historia en un Android físico, medir los requisitos de calidad en el teléfono y hacer la prueba
 > de usabilidad con vecinos (INV-02). Las celdas *pendientes* de los documentos no se inventan.
 
@@ -24,7 +24,9 @@ Es un ejemplo para estudiar, no para copiar: su problema es otro.
    la foto en grande.
 3. **Hacer que llegue** (HU-10): compartir por WhatsApp (o cualquier app) con la foto, la fecha, el lugar y un enlace al
    mapa; la lista marca lo que ya se compartió.
-4. **Privacidad** (TEC-05): aviso antes del primer reporte, borrar un reporte con su foto, nada sale del teléfono sin
+4. **Tipo de residuo y listado del mes** (HU-06, HU-09): cada reporte puede decir qué hay (escombros, colchones…) y la
+   JAC exporta el listado del mes en un CSV que se abre en Excel.
+5. **Privacidad** (TEC-05): aviso antes del primer reporte, borrar un reporte con su foto, nada sale del teléfono sin
    que la vecina lo decida.
 
 ## Dónde está cada cosa
@@ -37,8 +39,9 @@ Es un ejemplo para estudiar, no para copiar: su problema es otro.
 | 2 | SQLite, foto, referencia, guardar sin conexión → Hito 2 | [`docs/sprints/sprint-2.md`](docs/sprints/sprint-2.md) |
 | 3 | Ubicación, compartir, 200 reportes, migración de la base → Hito 3 | [`docs/sprints/sprint-3.md`](docs/sprints/sprint-3.md) |
 | 4 | Calidad, seguridad, build de release, usabilidad, Demo Day → Hitos 4 y 5 | [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md) · [`docs/calidad/plan-de-pruebas.md`](docs/calidad/plan-de-pruebas.md) · [`docs/seguridad.md`](docs/seguridad.md) · [`docs/privacidad.md`](docs/privacidad.md) · [`docs/distribucion.md`](docs/distribucion.md) · [`docs/cierre/demo-day.md`](docs/cierre/demo-day.md) |
+| 5 | Tipo de residuo, listado del mes en CSV, migración al esquema 3 | [`docs/sprints/sprint-5.md`](docs/sprints/sprint-5.md) |
 
-Cada sprint tiene su etiqueta de Git (`sprint-2`, `sprint-3`, `v1.0.0`) y cada elemento del backlog su rama fusionada con
+Cada sprint tiene su etiqueta de Git (`sprint-2`, `sprint-3`, `v1.0.0`, `v1.1.0`) y cada elemento del backlog su rama fusionada con
 `--no-ff`: `git log --graph --oneline` cuenta la historia.
 
 ## Ejecutar
@@ -48,7 +51,7 @@ Requisitos del curso: Flutter 3.47 / Dart 3.13, Android SDK API 36, Java 17 y un
 ```powershell
 flutter pub get
 flutter analyze        # meta: No issues found!
-flutter test           # 73 pruebas
+flutter test           # 98 pruebas
 flutter run            # en el teléfono conectado
 ```
 

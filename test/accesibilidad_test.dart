@@ -24,6 +24,7 @@ void main() {
         almacen: AlmacenFotosFalso(),
         ubicacion: FuenteUbicacionFalsa(),
         compartir: ServicioCompartirFalso(),
+        exportar: ServicioExportarFalso(),
         preferencias: PreferenciasFalsas(),
       ),
     );

@@ -12,6 +12,8 @@
 | Ubicación | Sí: dice dónde estuvo la vecina | Base SQLite privada | Solo si la vecina comparte (enlace al mapa) |
 | Referencia del lugar | Normalmente no | Base SQLite privada | Solo si la vecina comparte |
 | Fecha y hora | Asociada a la ubicación, sí | Base SQLite privada | Solo si la vecina comparte |
+| Tipo de residuo (HU-06) | No | Base SQLite privada | Solo si la vecina comparte |
+| Listado del mes (HU-09) | Contiene ubicaciones y fechas | Archivo temporal de la app, reemplazado en cada exportación | Solo si la vecina lo envía desde el menú de compartir |
 | «Ya leí el aviso» | No | Preferencias de la app | Nunca |
 
 No hay cuentas, nombres, teléfonos ni correos. Ningún dato es **sensible** en el sentido del artículo 5 de la Ley 1581
@@ -24,7 +26,7 @@ No hay cuentas, nombres, teléfonos ni correos. Ningún dato es **sensible** en 
 | **M1** Uso inadecuado de credenciales | Poco | No hay claves ni tokens en el código. La llave de firma y `key.properties` están en `.gitignore` | `git ls-files \| findstr /i "jks key.properties"` no devuelve nada |
 | **M2** Cadena de suministro insegura | Sí | 10 dependencias directas, todas de editores verificados en pub.dev (flutter.dev, dart.dev, dash-overflow.net, tekartik.com, baseflow.com, fluttercommunity.dev). Versiones fijadas en `pubspec.lock` | `flutter pub outdated` en cada Review; revisar el editor verificado en pub.dev antes de añadir un paquete |
 | **M3** Autenticación y autorización inseguras | No | No hay cuentas (fuera del alcance, ver `vision-y-alcance.md`) | — |
-| **M4** Validación insuficiente de entradas y salidas | Sí | La referencia tiene tope de 120 caracteres. Todo SQL usa `whereArgs`; nunca se pega texto de la vecina en una consulta | Prueba de HU-12; buscar `rawQuery` y `execute(` con interpolación de datos de la vecina: no hay |
+| **M4** Validación insuficiente de entradas y salidas | Sí | La referencia tiene tope de 120 caracteres. Todo SQL usa `whereArgs`; nunca se pega texto de la vecina en una consulta. El listado CSV (HU-09) neutraliza las celdas que empiezan con `=`, `+`, `-`, `@` (CSV injection) | Prueba de HU-12; `test/listado_mes_test.dart`; buscar `rawQuery` y `execute(` con interpolación de datos de la vecina: no hay |
 | **M5** Comunicación insegura | No | La app no usa la red. El manifiesto de release no tiene `INTERNET`. El enlace al mapa es `https` | Revisar el manifiesto combinado (ver abajo) |
 | **M6** Controles de privacidad inadecuados | **Sí** | Aviso antes del primer reporte; ubicación una sola vez y en primer plano (RC-06); sin analítica ni publicidad; borrar un reporte borra su foto; consejo de no fotografiar personas | Pruebas de widgets de TEC-05; no hay `ACCESS_BACKGROUND_LOCATION` en el manifiesto |
 | **M7** Protección insuficiente del binario | Sí | Release con R8 (por defecto) y Dart ofuscado: `--obfuscate --split-debug-info` | `docs/distribucion.md` |

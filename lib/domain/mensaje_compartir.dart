@@ -12,6 +12,11 @@ String componerMensaje(
     ..writeln('Punto crítico de basura reportado con EcoReporte')
     ..writeln('Fecha: ${formatearFecha(reporte.fecha)}');
 
+  // HU-06 · quien lo recibe sabe qué hay antes de ir.
+  if (reporte.categoria != null) {
+    texto.writeln('Tipo: ${reporte.categoria!.nombre}');
+  }
+
   if (reporte.referencia.isNotEmpty) {
     texto.writeln('Lugar: ${reporte.referencia}');
   }

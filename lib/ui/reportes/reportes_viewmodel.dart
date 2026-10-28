@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import '../../data/compartir/servicio_compartir.dart';
+import '../../data/compartir/servicio_exportar.dart';
 import '../../data/fotos/almacen_fotos.dart';
 import '../../data/reporte_repository.dart';
+import '../../domain/listado_mes.dart';
 import '../../domain/mensaje_compartir.dart';
 import '../../domain/reporte.dart';
 import '../comun/formatos.dart';
@@ -11,7 +13,8 @@ import '../comun/formatos.dart';
 enum EstadoUi { cargando, vacio, error, listo }
 
 /// ViewModel de «Mis reportes» (HU-04) y fuente del detalle (HU-05).
-/// Desde el Sprint 3 también comparte un reporte (HU-10).
+/// Desde el Sprint 3 también comparte un reporte (HU-10), y desde el
+/// Sprint 5 exporta el listado del mes (HU-09).
 ///
 /// La pantalla solo lee y pide: nunca habla con el repositorio.
 class ReportesViewModel extends ChangeNotifier {
@@ -19,11 +22,13 @@ class ReportesViewModel extends ChangeNotifier {
     this._repositorio, {
     required this._compartir,
     required this._almacen,
+    required this._exportar,
     DateTime Function()? reloj,
   }) : _reloj = reloj ?? DateTime.now;
 
   final ReporteRepository _repositorio;
   final ServicioCompartir _compartir;
+  final ServicioExportar _exportar;
   final AlmacenFotos _almacen;
   final DateTime Function() _reloj;
 
@@ -109,6 +114,44 @@ class ReportesViewModel extends ChangeNotifier {
       }
     }
     _compartiendo = null;
+    _avisar();
+    return resultado;
+  }
+
+  // ---------------------------------------------------------------- HU-09
+  bool _exportando = false;
+
+  /// Hay un listado preparándose: el botón se apaga.
+  bool get exportando => _exportando;
+
+  /// Los meses que se pueden exportar, del más reciente al más antiguo.
+  List<DateTime> get mesesExportables => mesesConReportes(_reportes);
+
+  /// Cuántos reportes tiene [mes].
+  int cuantosEn(DateTime mes) => reportesDelMes(_reportes, mes).length;
+
+  /// Arma el listado de [mes] y abre el menú de compartir con el archivo.
+  /// Un mes sin reportes no produce un archivo vacío: devuelve cancelado.
+  Future<ResultadoCompartir> exportarMes(DateTime mes) async {
+    final List<Reporte> delMes = reportesDelMes(_reportes, mes);
+    if (delMes.isEmpty || _exportando) return ResultadoCompartir.cancelado;
+    _exportando = true;
+    _avisar();
+
+    ResultadoCompartir resultado;
+    try {
+      final int n = delMes.length;
+      resultado = await _exportar.exportar(
+        nombreArchivo: nombreDelListado(mes),
+        contenido: componerListadoCsv(delMes),
+        texto: 'Puntos críticos de basura · ${formatearMes(mes)} · '
+            '$n ${n == 1 ? 'reporte' : 'reportes'} (EcoReporte)',
+      );
+    } catch (e) {
+      debugPrint('No se pudo exportar el listado: $e');
+      resultado = ResultadoCompartir.fallido;
+    }
+    _exportando = false;
     _avisar();
     return resultado;
   }

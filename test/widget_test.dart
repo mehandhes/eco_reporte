@@ -17,9 +17,11 @@ void main() {
   late AlmacenFotosFalso almacen;
   late FuenteUbicacionFalsa ubicacion;
   late ServicioCompartirFalso compartir;
+  late ServicioExportarFalso exportar;
   late PreferenciasFalsas preferencias;
 
   setUp(() {
+    exportar = ServicioExportarFalso();
     preferencias = PreferenciasFalsas();
     compartir = ServicioCompartirFalso();
     fotos = FuenteFotosFalsa();
@@ -52,6 +54,7 @@ void main() {
         almacen: almacen,
         ubicacion: ubicacion,
         compartir: compartir,
+        exportar: exportar,
         preferencias: preferencias,
       ),
     );
@@ -205,7 +208,15 @@ void main() {
     await tester.tap(find.text('Reportar'));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Guardar reporte'));
+    // Desde el Sprint 5 el formulario es más largo (tipo de residuo) y el
+    // ListView aún no construyó el botón: hay que desplazarse hasta él.
+    await tester.scrollUntilVisible(
+      find.text('Guardar reporte'),
+      200,
+      scrollable: find
+          .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+          .first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Guardar reporte'));
     await tester.pumpAndSettle();
@@ -371,5 +382,72 @@ void main() {
     expect(find.text('Mis reportes'), findsOneWidget);
     expect(find.textContaining('Lote de la esquina'), findsNothing);
     expect(find.text('Reporte borrado.'), findsOneWidget);
+  });
+
+  testWidgets('HU-06: el tipo elegido se guarda y se ve en la lista',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.vacio);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), 'Lote de la calle 52');
+    await tester.pumpAndSettle();
+    final Finder formulario = find
+        .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+        .first;
+    await tester.scrollUntilVisible(find.text('Muebles y colchones'), 200,
+        scrollable: formulario);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Muebles y colchones'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Guardar reporte'), 200,
+        scrollable: formulario);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mis reportes'), findsOneWidget);
+    expect(find.textContaining('Muebles y colchones · '), findsOneWidget);
+  });
+
+  testWidgets('HU-06: el detalle dice «Sin clasificar» si no se eligió tipo',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Esquina del colegio'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tipo de residuo'), findsOneWidget);
+    expect(find.text('Sin clasificar'), findsOneWidget);
+  });
+
+  testWidgets('HU-09: exportar pide el mes y comparte el listado',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Exportar listado del mes'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿De qué mes es el listado?'), findsOneWidget);
+    expect(find.text('Octubre de 2026'), findsOneWidget);
+    expect(find.text('5 reportes'), findsOneWidget);
+    expect(find.text('Septiembre de 2026'), findsOneWidget);
+
+    await tester.tap(find.text('Octubre de 2026'));
+    await tester.pumpAndSettle();
+
+    expect(exportar.veces, 1);
+    expect(exportar.nombreArchivo, 'ecoreporte_2026-10.csv');
+    expect(find.text('Listado de octubre de 2026 listo: 5 reportes.'), findsOneWidget);
+  });
+
+  testWidgets('HU-09: sin reportes no hay botón de exportar', (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.vacio);
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Exportar listado del mes'), findsNothing);
   });
 }

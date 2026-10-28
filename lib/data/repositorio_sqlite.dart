@@ -19,7 +19,8 @@ class RepositorioSqlite implements ReporteRepository {
   ///
   /// * 1 · Sprint 2: la tabla `reportes`.
   /// * 2 · Sprint 3: columna `compartido_ms` (HU-10, hallazgo H1).
-  static const int versionEsquema = 2;
+  /// * 3 · Sprint 5: columna `categoria` (HU-06).
+  static const int versionEsquema = 3;
 
   final DatabaseFactory? _fabrica;
   final String? _ruta;
@@ -54,7 +55,8 @@ class RepositorioSqlite implements ReporteRepository {
         longitud     REAL,
         precision_m  REAL,
         ruta_foto    TEXT,
-        compartido_ms INTEGER
+        compartido_ms INTEGER,
+        categoria    TEXT
       )
     ''');
     // «Mis reportes» siempre ordena por fecha: el índice lo hace barato
@@ -69,6 +71,10 @@ class RepositorioSqlite implements ReporteRepository {
   static Future<void> _migrar(Database db, int anterior, int nueva) async {
     if (anterior < 2) {
       await db.execute('ALTER TABLE $tabla ADD COLUMN compartido_ms INTEGER');
+    }
+    if (anterior < 3) {
+      // Los reportes viejos quedan con categoría nula: «Sin clasificar».
+      await db.execute('ALTER TABLE $tabla ADD COLUMN categoria TEXT');
     }
   }
 

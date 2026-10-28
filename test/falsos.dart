@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eco_reporte/data/compartir/servicio_compartir.dart';
+import 'package:eco_reporte/data/compartir/servicio_exportar.dart';
 import 'package:eco_reporte/data/fotos/almacen_fotos.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/preferencias/preferencias_app.dart';
@@ -108,6 +109,28 @@ class ServicioCompartirFalso implements ServicioCompartir {
     veces++;
     ultimoTexto = texto;
     ultimaFoto = rutaFoto;
+    return resultado;
+  }
+}
+
+/// Exportador falso (HU-09): guarda el archivo que se le pidió compartir.
+class ServicioExportarFalso implements ServicioExportar {
+  ResultadoCompartir resultado = ResultadoCompartir.compartido;
+  String? nombreArchivo;
+  String? contenido;
+  String? texto;
+  int veces = 0;
+
+  @override
+  Future<ResultadoCompartir> exportar({
+    required String nombreArchivo,
+    required String contenido,
+    required String texto,
+  }) async {
+    veces++;
+    this.nombreArchivo = nombreArchivo;
+    this.contenido = contenido;
+    this.texto = texto;
     return resultado;
   }
 }

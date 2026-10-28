@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../data/compartir/servicio_compartir.dart';
+import '../data/compartir/servicio_exportar.dart';
 import '../data/fotos/almacen_fotos.dart';
 import '../data/fotos/fuente_fotos.dart';
 import '../data/fotos/fuente_fotos_image_picker.dart';
@@ -26,6 +27,7 @@ class EcoReporteApp extends StatefulWidget {
     this.almacen,
     this.ubicacion,
     this.compartir,
+    this.exportar,
     this.preferencias,
   });
 
@@ -48,6 +50,9 @@ class EcoReporteApp extends StatefulWidget {
 
   /// Menú de compartir (HU-10). Nulo: el del sistema, con share_plus.
   final ServicioCompartir? compartir;
+
+  /// Listado del mes (HU-09). Nulo: archivo temporal + share_plus.
+  final ServicioExportar? exportar;
 
   /// Si ya se vio el aviso de privacidad (TEC-05). Nulo: shared_preferences.
   final PreferenciasApp? preferencias;
@@ -84,6 +89,7 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
             widget.repositorio,
             compartir: widget.compartir ?? ServicioCompartirSharePlus(),
             almacen: _almacen,
+            exportar: widget.exportar ?? ServicioExportarSharePlus(),
           )..cargar(),
         ),
         ChangeNotifierProvider<PrivacidadViewModel>(

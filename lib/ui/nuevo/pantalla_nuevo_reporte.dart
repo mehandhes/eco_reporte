@@ -10,12 +10,14 @@ import '../../domain/reporte.dart';
 import '../reportes/reportes_viewmodel.dart';
 import 'bloque_foto.dart';
 import 'bloque_ubicacion.dart';
+import 'campo_categoria.dart';
 import 'campo_referencia.dart';
 import 'nuevo_reporte_viewmodel.dart';
 
 /// Formulario «Nuevo reporte».
 /// Sprint 2: HU-01 (foto), HU-12 (referencia) y HU-03 (guardar).
 /// Sprint 3: HU-02 (ubicación automática).
+/// Sprint 5: HU-06 (tipo de residuo).
 class PantallaNuevoReporte extends StatelessWidget {
   const PantallaNuevoReporte({super.key});
 
@@ -54,6 +56,8 @@ class _Formulario extends StatelessWidget {
           BloqueUbicacion(vm: vm),
           const SizedBox(height: 24),
           CampoReferencia(vm: vm),
+          const SizedBox(height: 16),
+          CampoCategoria(vm: vm),
           if (vm.errorGuardado != null) ...<Widget>[
             const SizedBox(height: 16),
             _MensajeError(texto: vm.errorGuardado!),

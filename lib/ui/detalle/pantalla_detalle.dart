@@ -141,6 +141,11 @@ class _Contenido extends StatelessWidget {
                 : reporte.referencia,
           ),
           _Dato(
+            icono: Icons.category_outlined,
+            etiqueta: 'Tipo de residuo',
+            valor: reporte.categoria?.nombre ?? 'Sin clasificar',
+          ),
+          _Dato(
             icono: Icons.my_location,
             etiqueta: 'Coordenadas',
             valor: coordenadas,

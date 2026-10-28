@@ -27,7 +27,16 @@ historia del refinamiento.
 | TEC-06 | Build de release firmado | 2 | 4 | Fusionado · falta firmar con la llave del equipo |
 | INV-02 | Validar con dos vecinos, ahora con la app instalada | 3 | 4 | Protocolo listo · **falta la prueba** |
 | INV-05 | Demo Day: pitch, modelo de impacto y guion de la demo | 3 | 4 | Guion listo · falta ensayarlo |
-| HU-06, 07, 08, 09, 13 · TEC-03 · HU-11 | Should y Could | 30 | — | Fuera del cierre |
+| HU-06, 07, 08, 09, 13 · TEC-03 · HU-11 | Should y Could | 30 | — | Fuera del cierre (HU-06 y HU-09 pasan al Sprint 5, abajo) |
+
+## Después del cierre · Sprint 5 (versión 1.1.0)
+
+| ID | Elemento | Pts | Sprint | Estado |
+|---|---|---|---|---|
+| HU-06 | Tipo de residuo | 2 | 5 | Construida · falta su ficha de prueba en dispositivo |
+| HU-09 | Exportar el listado del mes | 5 | 5 | Construida · falta abrir el archivo en Excel en un computador en español |
+| HU-07, HU-13, HU-08, HU-11 | Sincronizar, mapa y avisos | 21 | — | Esperan la decisión sobre el servidor |
+| TEC-03 | Firebase App Distribution | 2 | — | Espera |
 
 ## Backlog refinado · fin del Sprint 1 (semana 4)
 

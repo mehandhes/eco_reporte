@@ -57,4 +57,16 @@ void main() {
     expect(texto, contains('Mapa (aproximada, ± 64 m):'));
     expect(texto, isNot(contains('Lugar:')), reason: 'sin referencia, no hay línea vacía');
   });
+
+  test('HU-06: el tipo de residuo va en el mensaje, si se eligió', () {
+    final Reporte conTipo = Reporte(
+      id: 4,
+      fecha: DateTime(2026, 11, 2),
+      referencia: 'Lote de la 52',
+      categoria: Categoria.escombros,
+    );
+
+    expect(mensaje(conTipo), contains('Tipo: Escombros'));
+    expect(mensaje(conGps), isNot(contains('Tipo:')));
+  });
 }

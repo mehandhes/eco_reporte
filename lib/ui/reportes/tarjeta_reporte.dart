@@ -5,7 +5,8 @@ import 'package:material_ui/material_ui.dart';
 import '../../domain/reporte.dart';
 import '../comun/formatos.dart';
 
-/// Una fila de «Mis reportes»: miniatura, lugar y fecha (HU-04).
+/// Una fila de «Mis reportes»: miniatura, lugar y fecha (HU-04), y el tipo
+/// de residuo si lo tiene (HU-06).
 class TarjetaReporte extends StatelessWidget {
   const TarjetaReporte({super.key, required this.reporte, required this.alPulsar});
 
@@ -14,7 +15,11 @@ class TarjetaReporte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String cuando = formatearFechaYHora(reporte.fecha);
+    final String fecha = formatearFechaYHora(reporte.fecha);
+    // HU-06 · el tipo de residuo se lee en la lista sin abrir el detalle.
+    final String cuando = reporte.categoria == null
+        ? fecha
+        : '${reporte.categoria!.nombre} · $fecha';
     final String titulo = reporte.referencia.isNotEmpty
         ? reporte.referencia
         : formatearCoordenadas(reporte);
