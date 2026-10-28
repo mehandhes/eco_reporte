@@ -14,10 +14,17 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
 
+    <!-- TEC-05 · Sin permiso INTERNET en release: la app no usa la red
+         (OWASP M5). Flutter lo agrega solo en debug y profile para hot reload.
+
+         allowBackup="false": los reportes no se copian a la nube de Google
+         sin que la vecina lo decida (OWASP M9, Ley 1581). Desde Android 12,
+         el paso directo a un teléfono nuevo sigue funcionando. -->
     <application
         android:label="EcoReporte"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

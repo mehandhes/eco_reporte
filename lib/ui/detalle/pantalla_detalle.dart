@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,12 @@ class PantallaDetalle extends StatelessWidget {
               icon: const Icon(Icons.share_outlined),
               onPressed: vm.compartiendo(id) ? null : () => _compartir(context, vm),
             ),
+          if (reporte != null)
+            IconButton(
+              tooltip: 'Borrar',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _borrar(context, vm),
+            ),
         ],
       ),
       body: reporte == null
@@ -45,6 +52,44 @@ class PantallaDetalle extends StatelessWidget {
               alCompartir: () => _compartir(context, vm),
             ),
     );
+  }
+
+  /// TEC-05 · Borrar el reporte y su foto (derecho a suprimir). Se confirma
+  /// antes, porque no se puede deshacer (heurística H5).
+  Future<void> _borrar(BuildContext context, ReportesViewModel vm) async {
+    final GoRouter navegador = GoRouter.of(context);
+    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
+    final bool? confirmado = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogo) => AlertDialog(
+        title: const Text('¿Borrar este reporte?'),
+        content: const Text(
+          'Se borran la foto y los datos de este teléfono. Lo que ya '
+          'compartiste por WhatsApp no se borra. No se puede deshacer.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogo).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogo).pop(true),
+            child: const Text('Borrar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmado != true) return;
+
+    final bool borrado = await vm.eliminar(id);
+    mensajero.showSnackBar(
+      SnackBar(
+        content: Text(borrado
+            ? 'Reporte borrado.'
+            : 'No se pudo borrar el reporte. Vuelve a intentarlo.'),
+      ),
+    );
+    if (borrado) navegador.pop();
   }
 
   Future<void> _compartir(BuildContext context, ReportesViewModel vm) async {

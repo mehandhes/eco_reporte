@@ -6,10 +6,12 @@ import '../data/compartir/servicio_compartir.dart';
 import '../data/fotos/almacen_fotos.dart';
 import '../data/fotos/fuente_fotos.dart';
 import '../data/fotos/fuente_fotos_image_picker.dart';
+import '../data/preferencias/preferencias_app.dart';
 import '../data/reporte_repository.dart';
 import '../data/repositorio_simulado.dart';
 import '../data/ubicacion/fuente_ubicacion.dart';
 import '../data/ubicacion/fuente_ubicacion_geolocator.dart';
+import '../ui/privacidad/privacidad_viewmodel.dart';
 import '../ui/reportes/reportes_viewmodel.dart';
 import 'enrutador.dart';
 import 'tema.dart';
@@ -24,6 +26,7 @@ class EcoReporteApp extends StatefulWidget {
     this.almacen,
     this.ubicacion,
     this.compartir,
+    this.preferencias,
   });
 
   /// De dónde salen los reportes.
@@ -45,6 +48,9 @@ class EcoReporteApp extends StatefulWidget {
 
   /// Menú de compartir (HU-10). Nulo: el del sistema, con share_plus.
   final ServicioCompartir? compartir;
+
+  /// Si ya se vio el aviso de privacidad (TEC-05). Nulo: shared_preferences.
+  final PreferenciasApp? preferencias;
 
   @override
   State<EcoReporteApp> createState() => _EcoReporteAppState();
@@ -77,6 +83,12 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
           create: (_) => ReportesViewModel(
             widget.repositorio,
             compartir: widget.compartir ?? ServicioCompartirSharePlus(),
+            almacen: _almacen,
+          )..cargar(),
+        ),
+        ChangeNotifierProvider<PrivacidadViewModel>(
+          create: (_) => PrivacidadViewModel(
+            widget.preferencias ?? PreferenciasSharedPreferences(),
           )..cargar(),
         ),
       ],

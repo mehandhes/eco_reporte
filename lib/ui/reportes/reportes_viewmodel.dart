@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../data/compartir/servicio_compartir.dart';
+import '../../data/fotos/almacen_fotos.dart';
 import '../../data/reporte_repository.dart';
 import '../../domain/mensaje_compartir.dart';
 import '../../domain/reporte.dart';
@@ -17,12 +18,15 @@ class ReportesViewModel extends ChangeNotifier {
   ReportesViewModel(
     this._repositorio, {
     required ServicioCompartir compartir,
+    required AlmacenFotos almacen,
     DateTime Function()? reloj,
   })  : _compartir = compartir,
+        _almacen = almacen,
         _reloj = reloj ?? DateTime.now;
 
   final ReporteRepository _repositorio;
   final ServicioCompartir _compartir;
+  final AlmacenFotos _almacen;
   final DateTime Function() _reloj;
 
   EstadoUi _estado = EstadoUi.cargando;
@@ -109,6 +113,29 @@ class ReportesViewModel extends ChangeNotifier {
     _compartiendo = null;
     _avisar();
     return resultado;
+  }
+
+  // ---------------------------------------------------------------- TEC-05
+  /// Borra el reporte [id] y su foto del teléfono (derecho a suprimir de la
+  /// Ley 1581 de 2012). Devuelve falso si no se pudo borrar.
+  Future<bool> eliminar(int id) async {
+    final Reporte? reporte = buscar(id);
+    if (reporte == null) return false;
+    try {
+      await _repositorio.eliminar(id);
+    } catch (e) {
+      debugPrint('No se pudo borrar el reporte: $e');
+      return false;
+    }
+    // Primero la fila y después la foto: si la app se cierra en medio,
+    // queda una foto huérfana (invisible), nunca un reporte sin foto.
+    if (reporte.rutaFoto != null) await _almacen.borrar(reporte.rutaFoto!);
+    _reportes = List<Reporte>.unmodifiable(
+      _reportes.where((Reporte r) => r.id != id),
+    );
+    if (_reportes.isEmpty) _estado = EstadoUi.vacio;
+    _avisar();
+    return true;
   }
 
   void _reemplazar(Reporte actualizado) {

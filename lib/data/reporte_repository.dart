@@ -16,6 +16,10 @@ abstract interface class ReporteRepository {
   /// Anota que el reporte [id] se compartió en [cuando] (HU-10) y devuelve
   /// el reporte actualizado. Lanza [ErrorDeGuardado] si no se pudo.
   Future<Reporte> marcarCompartido(int id, DateTime cuando);
+
+  /// Borra el reporte [id] de la base (TEC-05 · derecho a suprimir, Ley
+  /// 1581). La foto la borra quien llama. Lanza [ErrorDeGuardado] si falla.
+  Future<void> eliminar(int id);
 }
 
 /// Los reportes guardados no se pudieron leer.

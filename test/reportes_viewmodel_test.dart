@@ -12,10 +12,12 @@ import 'falsos.dart';
 void main() {
   late RepositorioSimulado repositorio;
   late ServicioCompartirFalso compartir;
+  late AlmacenFotosFalso almacen;
   late ReportesViewModel vm;
 
   setUp(() {
     compartir = ServicioCompartirFalso();
+    almacen = AlmacenFotosFalso();
     repositorio = RepositorioSimulado(
       retardo: Duration.zero,
       ahora: DateTime(2026, 10, 13, 9),
@@ -23,6 +25,7 @@ void main() {
     vm = ReportesViewModel(
       repositorio,
       compartir: compartir,
+      almacen: almacen,
       reloj: () => DateTime(2026, 11, 9, 18),
     );
   });
@@ -110,6 +113,39 @@ void main() {
       await vm.cargar();
 
       expect(vm.buscar(2)!.fueCompartido, isTrue);
+    });
+  });
+
+  group('TEC-05 · Borrar un reporte', () {
+    test('desaparece de la lista y no vuelve al recargar', () async {
+      await vm.cargar();
+
+      expect(await vm.eliminar(3), isTrue);
+      expect(vm.buscar(3), isNull);
+      expect(vm.reportes, hasLength(5));
+
+      await vm.cargar();
+      expect(vm.buscar(3), isNull);
+    });
+
+    test('se borra también la foto del teléfono', () async {
+      final RepositorioFalso conFoto = RepositorioFalso();
+      final Reporte r = await conFoto.guardar(
+        BorradorReporte(
+          fecha: DateTime(2026, 11, 2),
+          referencia: 'a',
+          rutaFoto: '/app/fotos/1.jpg',
+        ),
+      );
+      final ReportesViewModel otro =
+          ReportesViewModel(conFoto, compartir: compartir, almacen: almacen);
+      addTearDown(otro.dispose);
+      await otro.cargar();
+
+      await otro.eliminar(r.id);
+
+      expect(almacen.borradas, <String>['/app/fotos/1.jpg']);
+      expect(otro.estado, EstadoUi.vacio);
     });
   });
 }

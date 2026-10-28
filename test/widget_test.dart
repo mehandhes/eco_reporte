@@ -17,8 +17,10 @@ void main() {
   late AlmacenFotosFalso almacen;
   late FuenteUbicacionFalsa ubicacion;
   late ServicioCompartirFalso compartir;
+  late PreferenciasFalsas preferencias;
 
   setUp(() {
+    preferencias = PreferenciasFalsas();
     compartir = ServicioCompartirFalso();
     fotos = FuenteFotosFalsa();
     almacen = AlmacenFotosFalso();
@@ -41,6 +43,7 @@ void main() {
         almacen: almacen,
         ubicacion: ubicacion,
         compartir: compartir,
+        preferencias: preferencias,
       ),
     );
     return repositorio;
@@ -298,5 +301,49 @@ void main() {
 
     final ScrollableState despues = tester.state(find.byType(Scrollable).first);
     expect(despues.position.pixels, antes);
+  });
+
+  testWidgets('TEC-05: el primer «Reportar» muestra el aviso de privacidad, el segundo no',
+      (WidgetTester tester) async {
+    preferencias.aceptado = false;
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Antes de tu primer reporte'), findsOneWidget);
+    expect(find.textContaining('Nunca en segundo plano'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Entendido, crear mi reporte'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Entendido, crear mi reporte'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nuevo reporte'), findsOneWidget);
+    expect(preferencias.aceptado, isTrue);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nuevo reporte'), findsOneWidget);
+  });
+
+  testWidgets('TEC-05: borrar pide confirmación y quita el reporte de la lista',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Lote de la esquina'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Borrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Borrar este reporte?'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Borrar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mis reportes'), findsOneWidget);
+    expect(find.textContaining('Lote de la esquina'), findsNothing);
+    expect(find.text('Reporte borrado.'), findsOneWidget);
   });
 }
