@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eco_reporte/data/fotos/almacen_fotos.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/reporte_repository.dart';
+import 'package:eco_reporte/data/ubicacion/fuente_ubicacion.dart';
 import 'package:eco_reporte/domain/reporte.dart';
 import 'package:eco_reporte/ui/nuevo/nuevo_reporte_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,16 +15,19 @@ void main() {
   late FuenteFotosFalsa fotos;
   late AlmacenFotosFalso almacen;
   late RepositorioFalso repositorio;
+  late FuenteUbicacionFalsa ubicacion;
   late NuevoReporteViewModel vm;
 
   setUp(() {
     fotos = FuenteFotosFalsa();
     almacen = AlmacenFotosFalso();
     repositorio = RepositorioFalso();
+    ubicacion = FuenteUbicacionFalsa();
     vm = NuevoReporteViewModel(
       fotos: fotos,
       almacen: almacen,
       repositorio: repositorio,
+      ubicacion: ubicacion,
       reloj: () => DateTime(2026, 11, 2, 7, 30),
     );
   });
@@ -179,6 +183,104 @@ void main() {
 
       repositorio.errorAlGuardar = null;
       expect(await vm.guardar(), isNotNull);
+    });
+  });
+
+  group('HU-02 · Ubicación automática', () {
+    test('Buena señal: coordenadas y precisión, y la referencia ya no es obligatoria', () async {
+      ubicacion.resultado = buenaSenal;
+
+      await vm.buscarUbicacion();
+
+      expect(vm.estadoUbicacion, EstadoUbicacion.obtenida);
+      expect(vm.latitud, 7.06531);
+      expect(vm.precisionMetros, 8);
+      expect(vm.ubicacionAproximada, isFalse);
+      expect(vm.referenciaObligatoria, isFalse);
+    });
+
+    test('Se ve que está buscando, y mientras tanto se puede tomar la foto', () async {
+      ubicacion.enCurso = Completer<ResultadoUbicacion>();
+
+      final Future<void> busqueda = vm.buscarUbicacion();
+      expect(vm.estadoUbicacion, EstadoUbicacion.buscando);
+
+      await vm.tomarFoto();
+      expect(vm.tieneFoto, isTrue);
+
+      ubicacion.enCurso!.complete(buenaSenal);
+      await busqueda;
+      expect(vm.estadoUbicacion, EstadoUbicacion.obtenida);
+    });
+
+    test('Permiso denegado: se puede guardar con referencia y sin coordenadas', () async {
+      await vm.buscarUbicacion();
+      expect(vm.estadoUbicacion, EstadoUbicacion.sinPermiso);
+
+      await llenar();
+      final Reporte? guardado = await vm.guardar();
+
+      expect(guardado, isNotNull);
+      expect(guardado!.tieneUbicacion, isFalse);
+    });
+
+    test('Bloqueado para siempre: se ofrece abrir los ajustes de la app', () async {
+      ubicacion.resultado = const SinPermisoDeUbicacion(bloqueado: true);
+
+      await vm.buscarUbicacion();
+      await vm.abrirAjustesDeLaApp();
+
+      expect(vm.estadoUbicacion, EstadoUbicacion.bloqueada);
+      expect(ubicacion.ajustesApp, 1);
+    });
+
+    test('Precisión peor que 50 m: se avisa y se puede pedir de nuevo', () async {
+      ubicacion.resultado = const UbicacionObtenida(
+        latitud: 7.06244,
+        longitud: -73.85155,
+        precisionMetros: 64,
+      );
+      await vm.buscarUbicacion();
+      expect(vm.ubicacionAproximada, isTrue);
+
+      ubicacion.resultado = buenaSenal;
+      await vm.buscarUbicacion();
+      expect(vm.ubicacionAproximada, isFalse);
+      expect(ubicacion.veces, 2);
+    });
+
+    test('GPS apagado y sin señal son estados distintos', () async {
+      ubicacion.resultado = const GpsApagado();
+      await vm.buscarUbicacion();
+      expect(vm.estadoUbicacion, EstadoUbicacion.gpsApagado);
+
+      ubicacion.resultado = const SinSenalGps();
+      await vm.buscarUbicacion();
+      expect(vm.estadoUbicacion, EstadoUbicacion.sinSenal);
+    });
+
+    test('Si un reintento falla, se conserva la ubicación que ya había', () async {
+      ubicacion.resultado = buenaSenal;
+      await vm.buscarUbicacion();
+
+      ubicacion.resultado = const SinSenalGps();
+      await vm.buscarUbicacion();
+
+      expect(vm.tieneUbicacion, isTrue);
+      expect(vm.estadoUbicacion, EstadoUbicacion.obtenida);
+    });
+
+    test('El reporte guardado lleva las coordenadas y su precisión', () async {
+      ubicacion.resultado = buenaSenal;
+      await vm.buscarUbicacion();
+      await vm.tomarFoto();
+
+      final Reporte? guardado = await vm.guardar();
+
+      expect(guardado!.latitud, 7.06531);
+      expect(guardado.longitud, -73.85472);
+      expect(guardado.precisionMetros, 8);
+      expect(guardado.referencia, isEmpty, reason: 'con GPS, la referencia es opcional');
     });
   });
 }

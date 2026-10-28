@@ -17,17 +17,21 @@ String formatearHora(DateTime fecha) {
   return '$hora:$minutos $sufijo';
 }
 
-/// Coordenadas con cinco decimales (unos 1,1 m) o el motivo de que no haya.
+/// «7.06531, -73.85472»: cinco decimales, unos 1,1 m.
+String formatearPunto(double latitud, double longitud) =>
+    '${latitud.toStringAsFixed(5)}, ${longitud.toStringAsFixed(5)}';
+
+/// «± 12 m».
+String formatearMetros(double metros) => '± ${metros.round()} m';
+
+/// Coordenadas del reporte o el motivo de que no haya.
 String formatearCoordenadas(Reporte reporte) {
-  if (!reporte.tieneUbicacion) return 'Sin ubicación: se negó el permiso';
-  final String lat = reporte.latitud!.toStringAsFixed(5);
-  final String lng = reporte.longitud!.toStringAsFixed(5);
-  return '$lat, $lng';
+  if (!reporte.tieneUbicacion) return 'Sin ubicación: no se tomó el GPS';
+  return formatearPunto(reporte.latitud!, reporte.longitud!);
 }
 
 /// «± 12 m», o nada si no hay precisión.
 String formatearPrecision(Reporte reporte) {
   final double? metros = reporte.precisionMetros;
-  if (metros == null) return '';
-  return '± ${metros.round()} m';
+  return metros == null ? '' : formatearMetros(metros);
 }

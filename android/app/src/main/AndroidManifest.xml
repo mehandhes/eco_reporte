@@ -7,6 +7,13 @@
          ahí se usa la galería. -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
+    <!-- HU-02 · Ubicación, solo en primer plano (RC-06). Se piden las dos
+         juntas: desde Android 12 la vecina puede conceder solo la aproximada.
+         No hay ACCESS_BACKGROUND_LOCATION: la app nunca la lee en segundo plano. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+
     <application
         android:label="EcoReporte"
         android:name="${applicationName}"

@@ -1,7 +1,7 @@
 name: eco_reporte
 description: Reporte ciudadano de puntos críticos de residuos (ODS 11, Barrancabermeja). Proyecto modelo del curso DAM · UNIPAZ.
 publish_to: 'none'
-version: 0.2.0+2
+version: 0.3.0+3
 
 environment:
   sdk: ^3.13.0
@@ -16,6 +16,7 @@ dependencies:
   path: ^1.9.1               # unir rutas de archivos sin errores
   image_picker: ^1.2.3       # cámara y galería (HU-01)
   path_provider: ^2.1.6      # carpeta privada de la app para las fotos (HU-03)
+  geolocator: ^14.0.3        # ubicación del punto, solo en primer plano (HU-02)
 
 dev_dependencies:
   flutter_test:
