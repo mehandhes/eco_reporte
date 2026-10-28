@@ -148,6 +148,8 @@ void main() {
     await tester.tap(find.text('Reportar'));
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.byType(TextFormField));
+    await tester.pumpAndSettle();
     expect(find.text('Te quedan 120 caracteres'), findsOneWidget);
 
     await tester.enterText(find.byType(TextFormField), 'x' * 130);
@@ -225,6 +227,8 @@ void main() {
 
     expect(find.text('Sin permiso de ubicación'), findsOneWidget);
     expect(find.textContaining('una sola vez, mientras llenas este reporte'), findsOneWidget);
+    await tester.ensureVisible(find.byType(TextFormField));
+    await tester.pumpAndSettle();
     expect(find.text('Referencia del lugar *'), findsOneWidget);
   });
 
