@@ -4,6 +4,7 @@ import 'package:eco_reporte/app/eco_reporte_app.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/repositorio_simulado.dart';
 import 'package:eco_reporte/data/ubicacion/fuente_ubicacion.dart';
+import 'package:eco_reporte/ui/comun/logo.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -33,6 +34,7 @@ void main() {
     WidgetTester tester,
     Escenario escenario, {
     bool telefono = true,
+    String ruta = '/reportes',
   }) async {
     if (telefono) {
       // Pantalla de un teléfono común (411 × 914 dp) y no la de 800 × 600
@@ -56,6 +58,7 @@ void main() {
         compartir: compartir,
         exportar: exportar,
         preferencias: preferencias,
+        rutaInicial: ruta,
       ),
     );
     return repositorio;
@@ -135,7 +138,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Nuevo reporte'), findsOneWidget);
-    expect(find.text('Toca para tomar la foto *'), findsOneWidget);
+    expect(find.text('Toca para tomar la foto'), findsOneWidget);
   });
 
   testWidgets('HU-01: cámara denegada explica para qué es y ofrece la galería',
@@ -146,7 +149,7 @@ void main() {
     await tester.tap(find.text('Reportar'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.tap(find.text('Toca para tomar la foto'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('estado real del lugar'), findsOneWidget);
@@ -162,7 +165,12 @@ void main() {
 
     await tester.ensureVisible(find.byType(TextFormField));
     await tester.pumpAndSettle();
-    expect(find.text('Te quedan 120 caracteres'), findsOneWidget);
+    // El contador aparece solo cerca del límite (Sprint 6).
+    expect(find.textContaining('Te quedan'), findsNothing);
+
+    await tester.enterText(find.byType(TextFormField), 'x' * 100);
+    await tester.pump();
+    expect(find.text('Te quedan 20 caracteres'), findsOneWidget);
 
     await tester.enterText(find.byType(TextFormField), 'x' * 130);
     await tester.pump();
@@ -179,7 +187,7 @@ void main() {
     await tester.tap(find.text('Reportar'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.tap(find.text('Toca para tomar la foto'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), 'Frente a la cancha, junto al poste');
     await tester.pumpAndSettle();
@@ -257,7 +265,7 @@ void main() {
     expect(find.textContaining('una sola vez, mientras llenas este reporte'), findsOneWidget);
     await tester.ensureVisible(find.byType(TextFormField));
     await tester.pumpAndSettle();
-    expect(find.text('Referencia del lugar *'), findsOneWidget);
+    expect(find.textContaining('Obligatoria: sin ubicación'), findsOneWidget);
   });
 
   testWidgets('HU-02: precisión peor que 50 m muestra «Ubicación aproximada»',
@@ -391,7 +399,7 @@ void main() {
     await tester.tap(find.text('Reportar'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.tap(find.text('Toca para tomar la foto'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), 'Lote de la calle 52');
     await tester.pumpAndSettle();
@@ -410,7 +418,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Mis reportes'), findsOneWidget);
-    expect(find.textContaining('Muebles y colchones · '), findsOneWidget);
+    expect(find.text('Muebles y colchones'), findsOneWidget);
   });
 
   testWidgets('HU-06: el detalle dice «Sin clasificar» si no se eligió tipo',
@@ -449,5 +457,87 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Exportar listado del mes'), findsNothing);
+  });
+
+  testWidgets('Sprint 6: la barra de abajo dice qué falta y «Guardar» siempre está a la vista',
+      (WidgetTester tester) async {
+    ubicacion.resultado = buenaSenal;
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Falta: la foto'), findsOneWidget);
+    expect(find.text('Guardar reporte').hitTestable(), findsOneWidget,
+        reason: 'el botón se ve sin desplazarse');
+
+    await tester.tap(find.text('Toca para tomar la foto'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Listo. Se guarda aunque no tengas datos.'), findsOneWidget);
+    expect(find.text('Guardar reporte').hitTestable(), findsOneWidget);
+  });
+
+  group('Sprint 6 · Pantalla de inicio', () {
+    testWidgets('muestra el nombre, el eslogan y cuántos reportes hay',
+        (WidgetTester tester) async {
+      await abrirApp(tester, Escenario.conDatos, ruta: '/');
+      await tester.pumpAndSettle();
+
+      expect(find.text('EcoReporte'), findsOneWidget);
+      expect(find.text('Tu barrio limpio empieza con una foto.'), findsOneWidget);
+      expect(find.byType(LogoEcoReporte), findsOneWidget);
+      expect(find.text('6 guardados en este teléfono'), findsOneWidget);
+      expect(find.text('Reportar un punto').hitTestable(), findsOneWidget,
+          reason: 'el botón principal se ve sin desplazarse');
+    });
+
+    testWidgets('«Reportar un punto» abre el formulario', (WidgetTester tester) async {
+      await abrirApp(tester, Escenario.conDatos, ruta: '/');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Reportar un punto'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nuevo reporte'), findsOneWidget);
+    });
+
+    testWidgets('«Mis reportes» abre la lista y «atrás» vuelve al inicio',
+        (WidgetTester tester) async {
+      await abrirApp(tester, Escenario.conDatos, ruta: '/');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Mis reportes'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Lote de la esquina'), findsOneWidget);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('EcoReporte'), findsOneWidget);
+    });
+
+    testWidgets('sin reportes, el listado del mes está apagado y lo dice',
+        (WidgetTester tester) async {
+      await abrirApp(tester, Escenario.vacio, ruta: '/');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Aún no tienes reportes'), findsOneWidget);
+      expect(find.text('Disponible cuando tengas reportes'), findsOneWidget);
+      await tester.tap(find.text('Listado del mes'));
+      await tester.pumpAndSettle();
+      expect(find.text('¿De qué mes es el listado?'), findsNothing);
+    });
+
+    testWidgets('«Listado del mes» exporta desde el inicio', (WidgetTester tester) async {
+      await abrirApp(tester, Escenario.conDatos, ruta: '/');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Listado del mes'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Octubre de 2026'));
+      await tester.pumpAndSettle();
+
+      expect(exportar.nombreArchivo, 'ecoreporte_2026-10.csv');
+    });
   });
 }

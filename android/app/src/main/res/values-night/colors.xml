@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo del tema oscuro de lib/app/tema.dart -->
+    <color name="fondo_inicio">#0F1712</color>
+</resources>

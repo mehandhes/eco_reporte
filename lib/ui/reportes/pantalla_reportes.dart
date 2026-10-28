@@ -2,12 +2,11 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/compartir/servicio_compartir.dart';
 import '../../data/repositorio_simulado.dart';
 import '../../domain/reporte.dart';
 import '../comun/aviso.dart';
-import '../comun/formatos.dart';
-import '../privacidad/privacidad_viewmodel.dart';
+import '../comun/crear_reporte.dart';
+import 'exportar_listado.dart';
 import 'reportes_viewmodel.dart';
 import 'selector_escenario.dart';
 import 'tarjeta_reporte.dart';
@@ -28,11 +27,16 @@ class PantallaReportes extends StatelessWidget {
         actions: <Widget>[
           if (simulado != null) SelectorEscenario(repositorio: simulado),
           // HU-09 · solo cuando hay algo que exportar.
+          // Sprint 6 · con palabra y no solo icono (hallazgo D10): la
+          // presidenta de la JAC lo encuentra sin adivinar.
           if (vm.estado == EstadoUi.listo)
-            IconButton(
-              tooltip: 'Exportar listado del mes',
-              icon: const Icon(Icons.summarize_outlined),
-              onPressed: vm.exportando ? null : () => _exportar(context, vm),
+            Tooltip(
+              message: 'Exportar listado del mes',
+              child: TextButton.icon(
+                onPressed: vm.exportando ? null : () => exportarListado(context, vm),
+                icon: const Icon(Icons.download_outlined),
+                label: const Text('Listado'),
+              ),
             ),
           IconButton(
             tooltip: 'Privacidad',
@@ -42,7 +46,7 @@ class PantallaReportes extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _crearReporte(context),
+        onPressed: () => crearReporte(context),
         icon: const Icon(Icons.add_a_photo_outlined),
         label: const Text('Reportar'),
       ),
@@ -68,7 +72,7 @@ class PantallaReportes extends StatelessWidget {
             detalle: 'Cuando veas basura acumulada en tu barrio, repórtala '
                 'con una foto. Se guarda aunque no tengas datos.',
             accion: 'Crear el primero',
-            alPulsar: () => _crearReporte(context),
+            alPulsar: () => crearReporte(context),
           ),
         EstadoUi.listo => RefreshIndicator(
             onRefresh: vm.cargar,
@@ -94,62 +98,5 @@ class PantallaReportes extends StatelessWidget {
           ),
       },
     );
-  }
-
-  /// HU-09 · Elige el mes y abre el menú de compartir con el listado.
-  Future<void> _exportar(BuildContext context, ReportesViewModel vm) async {
-    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
-    final DateTime? mes = await showDialog<DateTime>(
-      context: context,
-      builder: (BuildContext dialogo) => SimpleDialog(
-        title: const Text('¿De qué mes es el listado?'),
-        children: <Widget>[
-          for (final DateTime opcion in vm.mesesExportables)
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              leading: const Icon(Icons.calendar_month_outlined),
-              title: Text(_capitalizar(formatearMes(opcion))),
-              subtitle: Text(_reportes(vm.cuantosEn(opcion))),
-              onTap: () => Navigator.of(dialogo).pop(opcion),
-            ),
-        ],
-      ),
-    );
-    if (mes == null) return;
-
-    final ResultadoCompartir resultado = await vm.exportarMes(mes);
-    switch (resultado) {
-      case ResultadoCompartir.compartido:
-        mensajero.showSnackBar(
-          SnackBar(
-            content: Text('Listado de ${formatearMes(mes)} listo: '
-                '${_reportes(vm.cuantosEn(mes))}.'),
-          ),
-        );
-      case ResultadoCompartir.fallido:
-        mensajero.showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo preparar el listado. '
-                'Vuelve a intentarlo.'),
-          ),
-        );
-      case ResultadoCompartir.cancelado:
-        break;
-    }
-  }
-
-  static String _reportes(int n) => n == 1 ? '1 reporte' : '$n reportes';
-
-  static String _capitalizar(String texto) =>
-      texto.isEmpty ? texto : texto[0].toUpperCase() + texto.substring(1);
-
-  /// HU-01 · Abre el formulario «Nuevo reporte». La primera vez pasa antes
-  /// por el aviso de privacidad (TEC-05, RC-06).
-  Future<void> _crearReporte(BuildContext context) async {
-    if (!context.read<PrivacidadViewModel>().aceptado) {
-      final bool? sigue = await context.push<bool>('/privacidad?primera=1');
-      if (sigue != true || !context.mounted) return;
-    }
-    context.push('/nuevo');
   }
 }

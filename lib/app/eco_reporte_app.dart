@@ -29,6 +29,7 @@ class EcoReporteApp extends StatefulWidget {
     this.compartir,
     this.exportar,
     this.preferencias,
+    this.rutaInicial = '/',
   });
 
   /// De dónde salen los reportes.
@@ -54,6 +55,10 @@ class EcoReporteApp extends StatefulWidget {
   /// Listado del mes (HU-09). Nulo: archivo temporal + share_plus.
   final ServicioExportar? exportar;
 
+  /// Dónde arranca la app. '/' (inicio) en el teléfono; las pruebas de
+  /// «Mis reportes» arrancan en '/reportes'.
+  final String rutaInicial;
+
   /// Si ya se vio el aviso de privacidad (TEC-05). Nulo: shared_preferences.
   final PreferenciasApp? preferencias;
 
@@ -62,7 +67,7 @@ class EcoReporteApp extends StatefulWidget {
 }
 
 class _EcoReporteAppState extends State<EcoReporteApp> {
-  late final GoRouter _enrutador = crearEnrutador();
+  late final GoRouter _enrutador = crearEnrutador(inicial: widget.rutaInicial);
   late final FuenteFotos _fotos = widget.fotos ?? FuenteFotosImagePicker();
   late final AlmacenFotos _almacen = widget.almacen ?? AlmacenFotosLocal();
   late final FuenteUbicacion _ubicacion =

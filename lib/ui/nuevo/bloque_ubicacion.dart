@@ -87,6 +87,7 @@ class _Obtenida extends StatelessWidget {
       );
     }
     return _Fila(
+      aviso: true,
       icono: const Icon(Icons.warning_amber_outlined),
       titulo: 'Ubicación aproximada',
       detalle: '$texto. Una referencia del lugar ayuda a encontrarlo.',
@@ -105,8 +106,13 @@ class _Fila extends StatelessWidget {
     this.alPulsar,
     this.accion2,
     this.alPulsar2,
+    this.aviso = false,
   });
 
+  /// Sprint 6 · Pide atención sin ser un error (ubicación aproximada): se
+  /// pinta con el «amarillo señal» del tema. Siempre con icono y palabras,
+  /// nunca solo con el color.
+  final bool aviso;
   final Widget icono;
   final String titulo;
   final String detalle;
@@ -118,8 +124,16 @@ class _Fila extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textos = Theme.of(context).textTheme;
+    final ColorScheme colores = Theme.of(context).colorScheme;
     return Card.outlined(
       margin: EdgeInsets.zero,
+      color: aviso ? colores.tertiaryContainer : null,
+      shape: aviso
+          ? RoundedRectangleBorder(
+              borderRadius: const BorderRadius.all(Radius.circular(14)),
+              side: BorderSide(color: colores.tertiary),
+            )
+          : null,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
         child: Column(
@@ -128,15 +142,33 @@ class _Fila extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Padding(padding: const EdgeInsets.only(top: 2), child: icono),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: IconTheme.merge(
+                    data: IconThemeData(
+                      color: aviso ? colores.onTertiaryContainer : null,
+                    ),
+                    child: icono,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(titulo, style: textos.titleSmall),
+                      Text(
+                        titulo,
+                        style: textos.titleSmall?.copyWith(
+                          color: aviso ? colores.onTertiaryContainer : null,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text(detalle, style: textos.bodyMedium),
+                      Text(
+                        detalle,
+                        style: textos.bodyMedium?.copyWith(
+                          color: aviso ? colores.onTertiaryContainer : null,
+                        ),
+                      ),
                     ],
                   ),
                 ),

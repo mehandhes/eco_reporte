@@ -87,7 +87,7 @@ class PantallaPrivacidad extends StatelessWidget {
                 await context.read<PrivacidadViewModel>().aceptar();
                 navegador.pop(true);
               },
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
               child: const Text('Entendido, crear mi reporte'),
             ),
           ],

@@ -17,21 +17,24 @@ class CampoReferencia extends StatelessWidget {
       maxLines: 2,
       minLines: 1,
       // HU-12 · «Referencia demasiado larga»: no se puede escribir más allá
-      // del límite, y el contador dice cuánto queda.
+      // del límite, y al acercarse el contador dice cuánto queda.
       maxLength: NuevoReporteViewModel.maxReferencia,
       maxLengthEnforcement: MaxLengthEnforcement.enforced,
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
-        labelText: vm.referenciaObligatoria
-            ? 'Referencia del lugar *'
-            : 'Referencia del lugar',
+        labelText: 'Referencia del lugar',
         hintText: 'Frente a la cancha, junto al poste',
-        helperText: '¿Cómo lo encuentra alguien que no es del barrio?',
-        helperMaxLines: 2,
+        // Sprint 6 · obligatoria u opcional, dicho en palabras.
+        helperText: vm.referenciaObligatoria
+            ? 'Obligatoria: sin ubicación, es lo que dirá dónde está el punto.'
+            : vm.ubicacionAproximada
+                ? 'Recomendada: la ubicación es aproximada. ¿Cómo lo '
+                    'encuentra alguien que no es del barrio?'
+                : 'Opcional. ¿Cómo lo encuentra alguien que no es del barrio?',
+        helperMaxLines: 3,
         errorText: vm.errorReferencia,
         errorMaxLines: 3,
-        border: const OutlineInputBorder(),
       ),
       buildCounter: (
         BuildContext context, {
@@ -40,6 +43,9 @@ class CampoReferencia extends StatelessWidget {
         required int? maxLength,
       }) {
         final int quedan = (maxLength ?? 0) - currentLength;
+        // Sprint 6 · el contador aparece solo cuando faltan 30 o menos:
+        // antes, ocupaba media fila y apretaba la ayuda en tres renglones.
+        if (quedan > 30) return null;
         final String texto = quedan == 0
             ? 'Llegaste al límite de $maxLength caracteres'
             : 'Te quedan $quedan caracteres';

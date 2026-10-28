@@ -102,8 +102,15 @@ class _SinFoto extends StatelessWidget {
             Icon(Icons.add_a_photo_outlined, size: 48, color: colores.primary),
           const SizedBox(height: 12),
           Text(
-            'Toca para tomar la foto *',
-            style: TextStyle(color: colores.onSurfaceVariant),
+            'Toca para tomar la foto',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 2),
+          // Sprint 6 · «Obligatoria» en palabras y no con un asterisco: el
+          // asterisco no lo lee bien TalkBack ni lo entiende todo el mundo.
+          Text(
+            'Obligatoria',
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),

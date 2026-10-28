@@ -315,4 +315,31 @@ void main() {
       expect(repositorio.reportes.single.categoria, Categoria.poda);
     });
   });
+
+  group('Sprint 6 · La barra de «Guardar»', () {
+    test('Dice qué falta, en orden: primero la foto, luego la referencia', () async {
+      await vm.buscarUbicacion(); // sin permiso: la referencia es obligatoria
+      expect(vm.estadoGuardar, 'Falta: la foto');
+      expect(vm.listoParaGuardar, isFalse);
+
+      await vm.tomarFoto();
+      expect(vm.estadoGuardar, contains('la referencia del lugar'));
+
+      vm.referencia = 'Esquina del colegio';
+      expect(vm.estadoGuardar, startsWith('Listo.'));
+      expect(vm.listoParaGuardar, isTrue);
+    });
+
+    test('Mientras busca la ubicación no regaña por la referencia', () async {
+      ubicacion.enCurso = Completer<ResultadoUbicacion>();
+      unawaited(vm.buscarUbicacion());
+      await vm.tomarFoto();
+
+      expect(vm.estadoGuardar, startsWith('Buscando la ubicación'));
+
+      ubicacion.enCurso!.complete(buenaSenal);
+      await pumpEventQueue();
+      expect(vm.estadoGuardar, startsWith('Listo.'));
+    });
+  });
 }

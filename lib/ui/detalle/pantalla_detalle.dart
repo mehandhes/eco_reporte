@@ -8,6 +8,7 @@ import '../../data/compartir/servicio_compartir.dart';
 import '../../domain/reporte.dart';
 import '../comun/aviso.dart';
 import '../comun/formatos.dart';
+import '../comun/icono_categoria.dart';
 import '../reportes/reportes_viewmodel.dart';
 
 /// HU-05 · Detalle de un reporte: foto en grande, fecha y hora, y lugar.
@@ -141,7 +142,9 @@ class _Contenido extends StatelessWidget {
                 : reporte.referencia,
           ),
           _Dato(
-            icono: Icons.category_outlined,
+            icono: reporte.categoria == null
+                ? Icons.category_outlined
+                : iconoDe(reporte.categoria!),
             etiqueta: 'Tipo de residuo',
             valor: reporte.categoria?.nombre ?? 'Sin clasificar',
           ),
@@ -174,7 +177,7 @@ class _Contenido extends StatelessWidget {
             icon: const Icon(Icons.share_outlined),
             label: const Text('Compartir por WhatsApp'),
             style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
+              minimumSize: const Size.fromHeight(56),
             ),
           ),
           const SizedBox(height: 8),

@@ -1,7 +1,7 @@
 name: eco_reporte
 description: Reporte ciudadano de puntos críticos de residuos (ODS 11, Barrancabermeja). Proyecto modelo del curso DAM · UNIPAZ.
 publish_to: 'none'
-version: 1.1.0+5
+version: 1.2.0+6
 
 environment:
   sdk: ^3.13.0
@@ -28,3 +28,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Sprint 6 · Atkinson Hyperlegible (Braille Institute, licencia OFL 1.1,
+  # ver assets/fuentes/OFL.txt): letra hecha para baja visión. Va dentro del
+  # APK: no se descarga nada al abrir la app (sin INTERNET, RC-06).
+  fonts:
+    - family: AtkinsonHyperlegible
+      fonts:
+        - asset: assets/fuentes/AtkinsonHyperlegible-Regular.ttf
+        - asset: assets/fuentes/AtkinsonHyperlegible-Bold.ttf
+          weight: 700

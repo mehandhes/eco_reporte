@@ -219,6 +219,23 @@ class NuevoReporteViewModel extends ChangeNotifier {
       ? 'Falta la foto. Tómala o elígela de la galería.'
       : null;
 
+  /// Sprint 6 · Lo que dice la barra de «Guardar», siempre a la vista: qué
+  /// falta antes de tocar el botón, y no después (heurística H5: prevenir
+  /// el error antes que explicarlo).
+  String get estadoGuardar {
+    if (_guardando) return 'Guardando en tu teléfono…';
+    if (!tieneFoto) return 'Falta: la foto';
+    if (faltaReferencia) {
+      return buscandoUbicacion
+          ? 'Buscando la ubicación. También puedes escribir una referencia.'
+          : 'Falta: la referencia del lugar (no hay ubicación)';
+    }
+    return 'Listo. Se guarda aunque no tengas datos.';
+  }
+
+  /// Tiene todo lo necesario para guardar.
+  bool get listoParaGuardar => tieneFoto && !faltaReferencia;
+
   /// Marca el intento de guardar y dice si el formulario está completo.
   bool validar() {
     _intentoGuardar = true;

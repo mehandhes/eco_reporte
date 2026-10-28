@@ -4,9 +4,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../domain/reporte.dart';
 import '../comun/formatos.dart';
+import '../comun/icono_categoria.dart';
 
-/// Una fila de «Mis reportes»: miniatura, lugar y fecha (HU-04), y el tipo
-/// de residuo si lo tiene (HU-06).
+/// Una fila de «Mis reportes»: miniatura, lugar, tipo de residuo si lo
+/// tiene (HU-06) y fecha (HU-04).
 class TarjetaReporte extends StatelessWidget {
   const TarjetaReporte({super.key, required this.reporte, required this.alPulsar});
 
@@ -15,11 +16,7 @@ class TarjetaReporte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String fecha = formatearFechaYHora(reporte.fecha);
-    // HU-06 · el tipo de residuo se lee en la lista sin abrir el detalle.
-    final String cuando = reporte.categoria == null
-        ? fecha
-        : '${reporte.categoria!.nombre} · $fecha';
+    final String cuando = formatearFechaYHora(reporte.fecha);
     final String titulo = reporte.referencia.isNotEmpty
         ? reporte.referencia
         : formatearCoordenadas(reporte);
@@ -34,27 +31,46 @@ class TarjetaReporte extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        // Hallazgo H1 · la lista muestra qué reportes ya se compartieron.
-        subtitle: reporte.fueCompartido
-            ? Text.rich(
-                TextSpan(
-                  text: '$cuando · ',
-                  children: <InlineSpan>[
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Icon(
-                        Icons.mark_chat_read_outlined,
-                        size: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const TextSpan(text: ' Compartido'),
-                  ],
-                ),
-              )
-            : Text(cuando),
+        // Sprint 6 · una línea por dato: el tipo con su icono (HU-06), la
+        // fecha y la marca «Compartido» (hallazgo H1). Así la fecha no se
+        // parte en dos renglones.
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (reporte.categoria != null)
+              _Linea(
+                icono: iconoDe(reporte.categoria!),
+                texto: reporte.categoria!.nombre,
+              ),
+            Text(cuando),
+            if (reporte.fueCompartido)
+              const _Linea(icono: Icons.mark_chat_read_outlined, texto: 'Compartido'),
+          ],
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: alPulsar,
+      ),
+    );
+  }
+}
+
+/// Un dato del subtítulo con su icono, en su propia línea.
+class _Linea extends StatelessWidget {
+  const _Linea({required this.icono, required this.texto});
+
+  final IconData icono;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: <Widget>[
+          Icon(icono, size: 18, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 6),
+          Flexible(child: Text(texto)),
+        ],
       ),
     );
   }
