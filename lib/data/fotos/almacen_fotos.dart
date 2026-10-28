@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -50,7 +51,11 @@ class AlmacenFotosLocal implements AlmacenFotos {
     final String destino = p.join(carpeta.path, 'reporte_$marca$extension');
 
     try {
-      await File(rutaTemporal).copy(destino);
+      final File copia = await File(rutaTemporal).copy(destino);
+      // RC-04 · cada foto pesa menos de 1 MB. Se ve en la consola de
+      // `flutter run` y se anota en el plan de pruebas.
+      final int kb = (await copia.length()) ~/ 1024;
+      debugPrint('Foto guardada: $kb KB${kb >= 1024 ? ' (¡supera RC-04!)' : ''}');
       return destino;
     } on FileSystemException catch (e) {
       // Una copia a medias no sirve: se borra antes de avisar.
