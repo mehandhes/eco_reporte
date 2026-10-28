@@ -3,88 +3,104 @@
 **Reporte ciudadano de puntos críticos de residuos · ODS 11 · Barrancabermeja**
 
 Proyecto modelo del curso *Desarrollo de Aplicaciones Móviles* (Ingeniería Informática, VIII semestre, UNIPAZ). Muestra
-cómo un equipo aplica el **Sprint 0** y el **Sprint 1** del marco del curso (Scrumban con fases de Mobile-D) con
-**Flutter**. Es un ejemplo para estudiar, no para copiar: su problema es otro.
+cómo un equipo lleva un producto de la idea al APK con el marco del curso (Scrumban con fases de Mobile-D) y **Flutter**.
+Es un ejemplo para estudiar, no para copiar: su problema es otro.
 
-> **Estado: fin del Sprint 1 (semana 4), fase de Exploración.** Hay requisitos v0.1 y criterios de aceptación de las
-> siete historias Must. El único código es la **prueba técnica del examen** (INV-04): «Mis reportes» con sus cuatro
-> estados y el detalle, sobre datos simulados. **Falta la validación con vecinos reales (INV-02).**
+> **Estado: versión 1.0.0, fin del Sprint 4 (cierre del curso).** Las siete historias Must del MVP están construidas,
+> con 73 pruebas automáticas, revisión de seguridad y build de release. Falta lo que solo puede hacer un equipo de
+> verdad: probar cada historia en un Android físico, medir los requisitos de calidad en el teléfono y hacer la prueba
+> de usabilidad con vecinos (INV-02). Las celdas *pendientes* de los documentos no se inventan.
 
 ## Objetivo del Producto
 
 > «Que cualquier vecino reporte un punto crítico de residuos en menos de un minuto, incluso sin conexión, y que su JAC
 > reciba un listado mensual verificable».
 
-**Para** los vecinos de los barrios de Barrancabermeja **que** ven puntos de basura acumulada y no saben a quién avisar,
-**EcoReporte es una** app móvil de reporte ciudadano **que** permite reportar un punto crítico con foto y ubicación en
-menos de un minuto. **A diferencia de** llamar a la línea de atención o escribir en grupos de Facebook, **nuestro
-producto** deja un registro georreferenciado que funciona sin conexión y que la Junta de Acción Comunal puede llevar a la
-empresa de aseo.
+## Qué hace la app
+
+1. **Reportar** (HU-01, HU-02, HU-12, HU-03): foto con la cámara o la galería, ubicación automática con aviso si es
+   aproximada, referencia del lugar y guardado en el teléfono **sin conexión**.
+2. **Consultar** (HU-04, HU-05): «Mis reportes» del más reciente al más antiguo, con sus cuatro estados, y el detalle con
+   la foto en grande.
+3. **Hacer que llegue** (HU-10): compartir por WhatsApp (o cualquier app) con la foto, la fecha, el lugar y un enlace al
+   mapa; la lista marca lo que ya se compartió.
+4. **Privacidad** (TEC-05): aviso antes del primer reporte, borrar un reporte con su foto, nada sale del teléfono sin
+   que la vecina lo decida.
 
 ## Dónde está cada cosa
 
-| Sprint | Paso de la guía | Archivo |
+| Sprint | Tema | Archivo |
 |---|---|---|
-| 0 | Visión, Objetivo del Producto, MoSCoW y fuera del alcance | [`docs/vision-y-alcance.md`](docs/vision-y-alcance.md) |
-| 0 | Backlog ordenado y estimado | [`docs/backlog.md`](docs/backlog.md) |
-| 0 | Tablero en GitHub Projects | [`docs/tablero.md`](docs/tablero.md) · [`scripts/crear-backlog.ps1`](scripts/crear-backlog.ps1) |
-| 0 | Definición del Flujo de Trabajo y Definición de Terminado | [`docs/flujo-de-trabajo.md`](docs/flujo-de-trabajo.md) |
-| 0 | Plantillas de issue y de pull request | [`.github/`](.github/) |
-| 0 | Roles, entregable y planificación del Sprint 1 | [`docs/sprints/sprint-0.md`](docs/sprints/sprint-0.md) |
-| 1 | Review, Retrospectiva y Planning | [`docs/sprints/sprint-0.md`](docs/sprints/sprint-0.md) · [`docs/sprints/sprint-1.md`](docs/sprints/sprint-1.md) |
-| 1 | Persona, mapa, MVP, calidad, heurísticas | [`docs/requisitos.md`](docs/requisitos.md) (v0.1) |
-| 1 | Criterios Dado / Cuando / Entonces | [`docs/criterios/`](docs/criterios/) · cuerpos de issue en [`scripts/issues/`](scripts/issues/) |
-| 1 | Validación con usuarios (pendiente) | [`docs/validacion/`](docs/validacion/) |
-| 1 | Examen práctico resuelto | [`docs/examen-sprint1.md`](docs/examen-sprint1.md) |
-| 1 | Prueba técnica en Flutter | [`lib/`](lib/) · [`test/`](test/) |
+| 0 | Visión, alcance, backlog, tablero, flujo de trabajo | [`docs/vision-y-alcance.md`](docs/vision-y-alcance.md) · [`docs/backlog.md`](docs/backlog.md) · [`docs/tablero.md`](docs/tablero.md) · [`docs/flujo-de-trabajo.md`](docs/flujo-de-trabajo.md) |
+| 1 | Requisitos, criterios Dado / Cuando / Entonces, validación | [`docs/requisitos.md`](docs/requisitos.md) · [`docs/criterios/`](docs/criterios/) · [`docs/validacion/`](docs/validacion/) |
+| 2–4 | **Plan de cierre en tres sprints** | [`docs/plan-de-cierre.md`](docs/plan-de-cierre.md) |
+| 2 | SQLite, foto, referencia, guardar sin conexión → Hito 2 | [`docs/sprints/sprint-2.md`](docs/sprints/sprint-2.md) |
+| 3 | Ubicación, compartir, 200 reportes, migración de la base → Hito 3 | [`docs/sprints/sprint-3.md`](docs/sprints/sprint-3.md) |
+| 4 | Calidad, seguridad, build de release, usabilidad, Demo Day → Hitos 4 y 5 | [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md) · [`docs/calidad/plan-de-pruebas.md`](docs/calidad/plan-de-pruebas.md) · [`docs/seguridad.md`](docs/seguridad.md) · [`docs/privacidad.md`](docs/privacidad.md) · [`docs/distribucion.md`](docs/distribucion.md) · [`docs/cierre/demo-day.md`](docs/cierre/demo-day.md) |
 
-## Ejecutar la prueba técnica
+Cada sprint tiene su etiqueta de Git (`sprint-2`, `sprint-3`, `v1.0.0`) y cada elemento del backlog su rama fusionada con
+`--no-ff`: `git log --graph --oneline` cuenta la historia.
 
-Requisitos del curso: Flutter 3.47 / Dart 3.13, Android SDK API 36 y un Android con depuración USB (o un emulador).
+## Ejecutar
+
+Requisitos del curso: Flutter 3.47 / Dart 3.13, Android SDK API 36, Java 17 y un Android con depuración USB.
 
 ```powershell
-# 1. Generar la carpeta android/ (no se versiona en el modelo: depende del SDK de cada equipo).
-#    flutter create no sobrescribe los archivos que ya existen.
-flutter create --org co.edu.unipaz.dam --project-name eco_reporte --platforms=android .
-
-# 2. Dependencias, análisis y pruebas
 flutter pub get
 flutter analyze        # meta: No issues found!
-flutter test           # 12 pruebas: los escenarios de HU-04 y HU-05
-
-# 3. A correr
-flutter run
+flutter test           # 73 pruebas
+flutter run            # en el teléfono conectado
 ```
 
-En modo de desarrollo, el icono de matraz de la barra superior cambia el escenario: **con datos**, **vacío**, **falla al
-leer** y **cargando sin fin**. Así se ven en el teléfono los cuatro estados de la lista.
+| Para… | Comando |
+|---|---|
+| Ver los cuatro estados de la lista y los 200 reportes de prueba | `flutter run --dart-define=DATOS=simulados` y el icono del matraz |
+| Medir el rendimiento (RC-03) | `flutter run --profile --dart-define=DATOS=simulados` + DevTools |
+| Compilar el APK para repartir | ver [`docs/distribucion.md`](docs/distribucion.md) |
 
-**Arquitectura (MVVM del curso):** `domain/` (modelo) · `data/` (repositorio: hoy simulado, en el Sprint 2 SQLite) ·
-`ui/` (pantallas que leen un `ChangeNotifier` con `context.watch`) · `app/` (Provider, `go_router` y tema). Paquetes:
-`material_ui`, `provider` y `go_router`.
+## Arquitectura (MVVM del curso)
+
+```
+lib/
+├── domain/      Reporte, BorradorReporte y el mensaje de compartir: Dart puro, sin Flutter
+├── data/        Contratos y sus implementaciones reales
+│   ├── repositorio_sqlite.dart        ReporteRepository sobre sqflite (esquema 2 con migración)
+│   ├── repositorio_simulado.dart      datos de ejemplo para pruebas y para revisar estados
+│   ├── fotos/       FuenteFotos (image_picker) y AlmacenFotos (carpeta privada)
+│   ├── ubicacion/   FuenteUbicacion (geolocator, una lectura, sin segundo plano)
+│   ├── compartir/   ServicioCompartir (share_plus)
+│   └── preferencias/ PreferenciasApp (shared_preferences)
+├── ui/          Una carpeta por pantalla: Pantalla + ViewModel (ChangeNotifier)
+│   ├── reportes/  · detalle/ · nuevo/ · privacidad/ · comun/
+└── app/         Provider (inyección), go_router (rutas) y tema Material 3
+```
+
+**La regla que sostiene todo:** las pantallas solo hablan con su ViewModel y los ViewModel solo con **contratos**
+(`abstract interface class`). Por eso las 73 pruebas corren en el computador con cámara, GPS y menú de compartir falsos
+(`test/falsos.dart`), y por eso cambiar los datos simulados por SQLite en el Sprint 2 no tocó ninguna pantalla.
 
 ## Ramas y forma de trabajar
 
-- `main` está protegida: todo entra por pull request con una revisión.
-- Una rama por elemento del backlog: `hu-04-lista-reportes`, `tec-02-sqlite`, `inv-04-…`.
-- El PR dice `Closes #N` para cerrar el issue y mover la tarjeta a «Hecho» al fusionar.
-- La prueba técnica del examen se hizo en `examen/sprint1-tecnico` y se fusionó tras la revisión. `git log --graph
-  --oneline` muestra la historia por sprints.
+- `main` protegida: todo entra por pull request con una revisión y `Closes #N`.
+- Una rama por elemento: `tec-02-sqlite`, `hu-01-tomar-foto`, `hu-02-ubicacion`, `tec-05-seguridad-privacidad`…
+- La Definición de Terminado está en [`docs/flujo-de-trabajo.md`](docs/flujo-de-trabajo.md); el plan de pruebas dice
+  qué se comprueba en el teléfono antes de mover una tarjeta a «Hecho».
 
 ## Historial de sprints
 
-| Sprint | Semana | Objetivo | Throughput | Resultado |
+| Sprint | Semana | Objetivo | Puntos | Resultado |
 |---|---|---|---|---|
-| 0 | 3 | Tablero y backlog listos para trabajar | 0 (línea de base) | Hecho |
-| 1 | 4 | Las historias Must tienen criterios de aceptación validados con dos vecinos del barrio | 3 (INV-01, INV-03, INV-04) | Criterios hechos; **validación pendiente** |
+| 0 | 3 | Tablero y backlog listos para trabajar | — | Hecho |
+| 1 | 4 | Las historias Must tienen criterios de aceptación validados con dos vecinos | — | Criterios hechos; validación pendiente |
+| 2 | Cierre · 1 | Una vecina crea un reporte con foto y referencia, sin conexión, y lo ve en «Mis reportes» | 11 | Código fusionado · Hito 2 |
+| 3 | Cierre · 2 | El reporte dice dónde está el punto y llega a los vecinos por WhatsApp | 10 | Código fusionado · Hito 3 |
+| 4 | Cierre · 3 | La app es segura, accesible y se instala desde un APK firmado | 14 | Código y documentos fusionados · Hitos 4 y 5 |
 
 ## Usar este repositorio en clase
 
-1. Leerlo junto a las guías-taller **22 · Sprint 0** y **23 · Sprint 1**: cada archivo dice a qué paso responde.
-2. Para practicar el tablero: crear un proyecto propio en GitHub Projects (`docs/tablero.md`) y cargar el backlog con
-   `scripts/crear-backlog.ps1`.
-3. Para el examen del Sprint 1: comparar el formato de `docs/examen-sprint1.md` con lo que entregó el equipo, y la
-   prueba técnica con la parte 2 del examen.
+Leerlo junto a las guías-taller de cada sprint (22 · Sprint 0, 23 · Sprint 1, 25 · Sprint 2, 26 · Sprint 3 y
+27 · Sprint 4): cada archivo dice a qué paso responde. Para comparar con un equipo, sirve mirar el mismo archivo en la
+etiqueta del sprint: `git checkout sprint-2`.
 
 ---
 Desarrollo de Aplicaciones Móviles · Ingeniería Informática · UNIPAZ · 2026

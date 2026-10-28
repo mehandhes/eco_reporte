@@ -6,6 +6,7 @@
 | Versión | Sprint | Qué cambió |
 |---|---|---|
 | 0.1 | Sprint 1 | Primera versión: persona, mapa, MVP, calidad y hallazgos heurísticos. Validación con usuarios pendiente |
+| 0.2 | Sprint 4 | Cierre en tres sprints (`plan-de-cierre.md`). H1 resuelto con la marca «Compartido» (Sprint 3). Cada RC enlazado con su prueba en `calidad/plan-de-pruebas.md`. La validación pasa a ser una prueba de usabilidad con la app instalada (`validacion/prueba-usabilidad.md`) |
 
 ## 1. Problema y ODS
 
@@ -128,7 +129,7 @@ Inspección de las historias Must con las diez heurísticas de Nielsen, antes de
 | H5 · Prevención de errores | HU-03 | Si no queda espacio en el teléfono, la foto no se guarda y ningún criterio decía qué pasa. | 4 | Escenario nuevo «Sin espacio en el teléfono» |
 | H3 · Control y libertad | HU-01 | Si entra una llamada a mitad del formulario, no estaba escrito que se conserve lo ya llenado. | 3 | Escenario nuevo «Una llamada a mitad del formulario» |
 | H10 · Ayuda | HU-03 | Nada le explicaba a la vecina qué pasa con su reporte después de guardarlo. | 3 | Escenario nuevo «La confirmación dice qué sigue» |
-| H1 · Visibilidad del estado | HU-10 | Tras compartir, el reporte no muestra que ya se compartió. | 2 | Nota para el prototipo: una marca en la lista |
+| H1 · Visibilidad del estado | HU-10 | Tras compartir, el reporte no muestra que ya se compartió. | 2 | Resuelto en el Sprint 3: marca «Compartido» en la lista y el detalle |
 | H2 · Relación con el mundo real | Todas | «Punto crítico» y «reporte» pueden no ser las palabras del barrio. | 2 | Pregunta para la entrevista (INV-02) |
 
 ## 8. Validación con usuarios

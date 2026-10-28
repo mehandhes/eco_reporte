@@ -6,7 +6,7 @@
 **Épicas:** Base (técnicas) · Reportar · Consultar · Sincronizar · Comunidad.
 **Historia de referencia:** HU-05 «abrir el detalle de un reporte» = **2 puntos**. Escala: 1, 2, 3, 5, 8. Nada de 13.
 
-## Plan de cierre · estado al final del Sprint 3
+## Plan de cierre · estado al final del Sprint 4 (cierre del curso)
 
 El curso se cierra en tres sprints (`docs/plan-de-cierre.md`). Esta tabla manda sobre las de abajo, que quedan como
 historia del refinamiento.
@@ -14,19 +14,19 @@ historia del refinamiento.
 | ID | Elemento | Pts | Sprint | Estado |
 |---|---|---|---|---|
 | TEC-01 | Proyecto Flutter con `material_ui` | 2 | 0 | Hecho |
-| TEC-02 | Modelo `Reporte` y repositorio SQLite | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
-| HU-01 | Tomar la foto del punto crítico | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
-| HU-12 | Referencia del lugar | 2 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
-| HU-03 | Guardar el reporte en el teléfono | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
-| HU-02 | Ubicación automática | 3 | 3 | Fusionado · falta la comprobación en Android |
-| HU-04 | Lista de mis reportes | 3 | 3 | Fusionado · falta medir RC-03 en el teléfono |
-| HU-05 | Detalle de un reporte | 2 | 3 | Fusionado · falta la comprobación en Android |
-| HU-10 | Compartir por WhatsApp | 2 | 3 | Fusionado · falta enviarlo a un contacto real |
-| TEC-04 | Calidad: plan de pruebas, accesibilidad, medición en gama de entrada | 3 | 4 | Backlog |
-| TEC-05 | Seguridad y privacidad (OWASP Mobile Top 10, Ley 1581) | 3 | 4 | Backlog |
-| TEC-06 | Build de release firmado | 2 | 4 | Backlog |
-| INV-02 | Validar con dos vecinos, ahora con la app instalada | 3 | 4 | Backlog |
-| INV-05 | Demo Day: pitch, modelo de impacto y guion de la demo | 3 | 4 | Backlog |
+| TEC-02 | Modelo `Reporte` y repositorio SQLite | 3 | 2 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-01 | Tomar la foto del punto crítico | 3 | 2 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-12 | Referencia del lugar | 2 | 2 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-03 | Guardar el reporte en el teléfono | 3 | 2 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-02 | Ubicación automática | 3 | 3 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-04 | Lista de mis reportes | 3 | 3 | Hecho cuando RC-03 esté medido en el teléfono |
+| HU-05 | Detalle de un reporte | 2 | 3 | Hecho cuando su ficha de prueba en dispositivo esté completa |
+| HU-10 | Compartir por WhatsApp | 2 | 3 | Hecho cuando se haya enviado a un contacto real |
+| TEC-04 | Calidad: plan de pruebas, accesibilidad, medición en gama de entrada | 3 | 4 | Fusionado · faltan las mediciones de RC en el teléfono |
+| TEC-05 | Seguridad y privacidad (OWASP Mobile Top 10, Ley 1581) | 3 | 4 | Fusionado · falta revisar el manifiesto combinado |
+| TEC-06 | Build de release firmado | 2 | 4 | Fusionado · falta firmar con la llave del equipo |
+| INV-02 | Validar con dos vecinos, ahora con la app instalada | 3 | 4 | Protocolo listo · **falta la prueba** |
+| INV-05 | Demo Day: pitch, modelo de impacto y guion de la demo | 3 | 4 | Guion listo · falta ensayarlo |
 | HU-06, 07, 08, 09, 13 · TEC-03 · HU-11 | Should y Could | 30 | — | Fuera del cierre |
 
 ## Backlog refinado · fin del Sprint 1 (semana 4)
