@@ -34,16 +34,12 @@ enum EstadoUbicacion {
 /// (HU-01 · «Una llamada a mitad del formulario»).
 class NuevoReporteViewModel extends ChangeNotifier {
   NuevoReporteViewModel({
-    required FuenteFotos fotos,
-    required AlmacenFotos almacen,
-    required ReporteRepository repositorio,
-    required FuenteUbicacion ubicacion,
+    required this._fotos,
+    required this._almacen,
+    required this._repositorio,
+    required this._ubicacion,
     DateTime Function()? reloj,
-  })  : _fotos = fotos,
-        _almacen = almacen,
-        _repositorio = repositorio,
-        _ubicacion = ubicacion,
-        _reloj = reloj ?? DateTime.now;
+  }) : _reloj = reloj ?? DateTime.now;
 
   final FuenteFotos _fotos;
   final FuenteUbicacion _ubicacion;

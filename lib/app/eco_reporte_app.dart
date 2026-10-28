@@ -87,6 +87,10 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
           )..cargar(),
         ),
         ChangeNotifierProvider<PrivacidadViewModel>(
+          // lazy: false · se crea (y lee la preferencia) al abrir la app, no
+          // en el primer toque de «Reportar»: si no, ese toque encontraría
+          // «aceptado» todavía en falso y mostraría el aviso otra vez.
+          lazy: false,
           create: (_) => PrivacidadViewModel(
             widget.preferencias ?? PreferenciasSharedPreferences(),
           )..cargar(),

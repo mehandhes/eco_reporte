@@ -17,12 +17,10 @@ enum EstadoUi { cargando, vacio, error, listo }
 class ReportesViewModel extends ChangeNotifier {
   ReportesViewModel(
     this._repositorio, {
-    required ServicioCompartir compartir,
-    required AlmacenFotos almacen,
+    required this._compartir,
+    required this._almacen,
     DateTime Function()? reloj,
-  })  : _compartir = compartir,
-        _almacen = almacen,
-        _reloj = reloj ?? DateTime.now;
+  }) : _reloj = reloj ?? DateTime.now;
 
   final ReporteRepository _repositorio;
   final ServicioCompartir _compartir;

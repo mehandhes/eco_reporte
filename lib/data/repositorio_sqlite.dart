@@ -10,9 +10,7 @@ import 'reporte_repository.dart';
 /// La fábrica y la ruta se pueden inyectar para que las pruebas usen una
 /// base en memoria con `sqflite_common_ffi` (ver `test/repositorio_sqlite_test.dart`).
 class RepositorioSqlite implements ReporteRepository {
-  RepositorioSqlite({DatabaseFactory? fabrica, String? ruta})
-      : _fabrica = fabrica,
-        _ruta = ruta;
+  RepositorioSqlite({this._fabrica, this._ruta});
 
   static const String tabla = 'reportes';
 

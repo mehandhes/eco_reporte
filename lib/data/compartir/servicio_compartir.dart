@@ -41,7 +41,7 @@ class ServicioCompartirSharePlus implements ServicioCompartir {
         ShareParams(
           text: texto,
           files: hayFoto
-              ? <XFile>[XFile(rutaFoto!, mimeType: 'image/jpeg')]
+              ? <XFile>[XFile(rutaFoto, mimeType: 'image/jpeg')]
               : null,
         ),
       );

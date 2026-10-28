@@ -29,8 +29,17 @@ void main() {
 
   Future<RepositorioSimulado> abrirApp(
     WidgetTester tester,
-    Escenario escenario,
-  ) async {
+    Escenario escenario, {
+    bool telefono = true,
+  }) async {
+    if (telefono) {
+      // Pantalla de un teléfono común (411 × 914 dp) y no la de 800 × 600
+      // que flutter_test usa por omisión: así el formulario se ve entero,
+      // como en el teléfono, y sus campos existen para la prueba.
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.625;
+      addTearDown(tester.view.reset);
+    }
     final RepositorioSimulado repositorio = RepositorioSimulado(
       retardo: Duration.zero,
       ahora: DateTime(2026, 10, 13, 9),
@@ -105,7 +114,7 @@ void main() {
     tester.view.devicePixelRatio = 2; // 720 / 2 = 360 dp de ancho
     addTearDown(tester.view.reset);
 
-    await abrirApp(tester, Escenario.conDatos);
+    await abrirApp(tester, Escenario.conDatos, telefono: false);
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Orilla del caño'));
     await tester.pumpAndSettle();
@@ -170,7 +179,15 @@ void main() {
     await tester.tap(find.text('Toca para tomar la foto *'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), 'Frente a la cancha, junto al poste');
-    await tester.ensureVisible(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+    // Con la foto ya tomada el formulario crece: se baja hasta el botón.
+    await tester.scrollUntilVisible(
+      find.text('Guardar reporte'),
+      200,
+      scrollable: find
+          .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+          .first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Guardar reporte'));
     await tester.pumpAndSettle();
@@ -296,7 +313,7 @@ void main() {
     expect(antes, greaterThan(0));
 
     // Una fila que está en pantalla: la del centro.
-    await tester.tapAt(const Offset(400, 300));
+    await tester.tapAt(const Offset(200, 300));
     await tester.pumpAndSettle();
     expect(find.text('Fecha y hora'), findsOneWidget);
 
@@ -318,7 +335,12 @@ void main() {
     expect(find.text('Antes de tu primer reporte'), findsOneWidget);
     expect(find.textContaining('Nunca en segundo plano'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('Entendido, crear mi reporte'));
+    // El botón está al final de una lista larga: hay que desplazarse hasta él.
+    await tester.scrollUntilVisible(
+      find.text('Entendido, crear mi reporte'),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Entendido, crear mi reporte'));
     await tester.pumpAndSettle();
