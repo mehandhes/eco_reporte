@@ -1,11 +1,17 @@
 import '../domain/reporte.dart';
 
-/// De dónde salen los reportes. La interfaz y los ViewModel solo conocen
-/// este contrato: cuando llegue el repositorio SQLite (TEC-02) se cambia la
-/// implementación en `main.dart` y ninguna pantalla se entera.
+/// De dónde salen y a dónde van los reportes. La interfaz y los ViewModel
+/// solo conocen este contrato: en el Sprint 2 (TEC-02) el repositorio
+/// simulado se cambió por el de SQLite en `main.dart` y ninguna pantalla se
+/// enteró.
 abstract interface class ReporteRepository {
   /// Todos los reportes, del más reciente al más antiguo (HU-04).
+  /// Lanza [ErrorDeLectura] si no se pueden leer.
   Future<List<Reporte>> obtenerTodos();
+
+  /// Guarda un borrador y devuelve el reporte con el id asignado (HU-03).
+  /// Lanza [ErrorDeGuardado] si no se pudo escribir.
+  Future<Reporte> guardar(BorradorReporte borrador);
 }
 
 /// Los reportes guardados no se pudieron leer.
@@ -16,4 +22,14 @@ class ErrorDeLectura implements Exception {
 
   @override
   String toString() => 'ErrorDeLectura: $detalle';
+}
+
+/// El reporte no se pudo escribir en la base.
+class ErrorDeGuardado implements Exception {
+  const ErrorDeGuardado([this.detalle = '']);
+
+  final String detalle;
+
+  @override
+  String toString() => 'ErrorDeGuardado: $detalle';
 }

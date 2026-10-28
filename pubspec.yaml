@@ -1,7 +1,7 @@
 name: eco_reporte
 description: Reporte ciudadano de puntos críticos de residuos (ODS 11, Barrancabermeja). Proyecto modelo del curso DAM · UNIPAZ.
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ^3.13.0
@@ -12,11 +12,14 @@ dependencies:
   material_ui: ^1.0.1        # widgets de Material 3 (fuera del SDK desde Flutter 3.47)
   provider: ^6.1.5           # inyección de dependencias y estado (MVVM del curso)
   go_router: ^17.5.0         # navegación declarativa
+  sqflite: ^2.4.3            # SQLite en el teléfono (TEC-02)
+  path: ^1.9.1               # unir rutas de archivos sin errores
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  sqflite_common_ffi: ^2.4.0 # SQLite en el computador, para flutter test
 
 flutter:
   uses-material-design: true

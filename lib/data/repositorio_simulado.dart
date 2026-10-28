@@ -6,9 +6,12 @@ import 'reporte_repository.dart';
 /// Los cuatro casos que toda lista tiene que saber dibujar.
 enum Escenario { conDatos, vacio, falla, cargando }
 
-/// Repositorio con datos de ejemplo para la prueba técnica del Sprint 1
-/// (INV-04). Permite elegir el escenario desde la app, solo en desarrollo,
-/// para ver en el teléfono los cuatro estados de «Mis reportes».
+/// Repositorio con datos de ejemplo. Nació en la prueba técnica del Sprint 1
+/// (INV-04) y sigue vivo por dos razones:
+///
+/// * las pruebas de widgets lo usan para ver los cuatro estados sin base;
+/// * en desarrollo se puede arrancar la app con él para revisar esos
+///   estados en el teléfono: `flutter run --dart-define=DATOS=simulados`.
 class RepositorioSimulado implements ReporteRepository {
   RepositorioSimulado({
     this.retardo = const Duration(milliseconds: 1500),
@@ -21,6 +24,10 @@ class RepositorioSimulado implements ReporteRepository {
 
   Escenario escenario = Escenario.conDatos;
 
+  /// Lo que se guardó durante la sesión, encima de los ejemplos.
+  final List<Reporte> _guardados = <Reporte>[];
+  int _siguienteId = 100;
+
   @override
   Future<List<Reporte>> obtenerTodos() async {
     if (escenario == Escenario.cargando) {
@@ -32,11 +39,19 @@ class RepositorioSimulado implements ReporteRepository {
       throw const ErrorDeLectura('falla simulada');
     }
     if (escenario == Escenario.vacio) {
-      return const <Reporte>[];
+      return List<Reporte>.of(_guardados);
     }
-    final List<Reporte> lista = _ejemplos();
+    final List<Reporte> lista = <Reporte>[..._guardados, ..._ejemplos()];
     lista.sort((Reporte a, Reporte b) => b.fecha.compareTo(a.fecha));
     return lista;
+  }
+
+  @override
+  Future<Reporte> guardar(BorradorReporte borrador) async {
+    await Future<void>.delayed(retardo);
+    final Reporte reporte = borrador.conId(_siguienteId++);
+    _guardados.insert(0, reporte);
+    return reporte;
   }
 
   /// Seis reportes verosímiles del barrio Primero de Mayo, en desorden a
