@@ -55,7 +55,9 @@ class AlmacenFotosFalso implements AlmacenFotos {
   }
 
   @override
-  Future<void> borrar(String ruta) async => borradas.add(ruta);
+  Future<void> borrar(String ruta) async {
+    borradas.add(ruta);
+  }
 }
 
 /// Repositorio en memoria, con una puerta para frenar el guardado.
@@ -86,8 +88,9 @@ class RepositorioFalso implements ReporteRepository {
   }
 
   @override
-  Future<void> eliminar(int id) async =>
-      reportes.removeWhere((Reporte r) => r.id == id);
+  Future<void> eliminar(int id) async {
+    reportes.removeWhere((Reporte r) => r.id == id);
+  }
 }
 
 /// Menú de compartir falso: anota lo que se le pidió compartir.
@@ -127,10 +130,14 @@ class FuenteUbicacionFalsa implements FuenteUbicacion {
   }
 
   @override
-  Future<void> abrirAjustesDeLaApp() async => ajustesApp++;
+  Future<void> abrirAjustesDeLaApp() async {
+    ajustesApp++;
+  }
 
   @override
-  Future<void> abrirAjustesDeUbicacion() async => ajustesUbicacion++;
+  Future<void> abrirAjustesDeUbicacion() async {
+    ajustesUbicacion++;
+  }
 }
 
 /// Una ubicación buena, en el barrio Primero de Mayo.
@@ -151,5 +158,7 @@ class PreferenciasFalsas implements PreferenciasApp {
   Future<bool> avisoPrivacidadAceptado() async => aceptado;
 
   @override
-  Future<void> aceptarAvisoPrivacidad() async => aceptado = true;
+  Future<void> aceptarAvisoPrivacidad() async {
+    aceptado = true;
+  }
 }
