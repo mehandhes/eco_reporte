@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../data/fotos/fuente_fotos.dart';
+import '../data/fotos/fuente_fotos_image_picker.dart';
 import '../data/reporte_repository.dart';
 import '../data/repositorio_simulado.dart';
 import '../ui/reportes/reportes_viewmodel.dart';
@@ -10,7 +12,12 @@ import 'tema.dart';
 
 /// Raíz de la app: inyecta las dependencias y monta el enrutador.
 class EcoReporteApp extends StatefulWidget {
-  const EcoReporteApp({super.key, required this.repositorio, this.simulado});
+  const EcoReporteApp({
+    super.key,
+    required this.repositorio,
+    this.simulado,
+    this.fotos,
+  });
 
   /// De dónde salen los reportes.
   final ReporteRepository repositorio;
@@ -19,12 +26,17 @@ class EcoReporteApp extends StatefulWidget {
   /// el selector de escenario. Nulo en cualquier otro caso.
   final RepositorioSimulado? simulado;
 
+  /// Cámara y galería (HU-01). Nulo: la real, con image_picker. Las pruebas
+  /// pasan una falsa.
+  final FuenteFotos? fotos;
+
   @override
   State<EcoReporteApp> createState() => _EcoReporteAppState();
 }
 
 class _EcoReporteAppState extends State<EcoReporteApp> {
   late final GoRouter _enrutador = crearEnrutador();
+  late final FuenteFotos _fotos = widget.fotos ?? FuenteFotosImagePicker();
 
   @override
   void dispose() {
@@ -38,6 +50,7 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
       providers: [
         Provider<ReporteRepository>.value(value: widget.repositorio),
         Provider<RepositorioSimulado?>.value(value: widget.simulado),
+        Provider<FuenteFotos>.value(value: _fotos),
         // '..cargar()' dispara la primera carga en cuanto se crea el ViewModel.
         ChangeNotifierProvider<ReportesViewModel>(
           create: (_) => ReportesViewModel(widget.repositorio)..cargar(),

@@ -1,12 +1,19 @@
 import 'package:eco_reporte/app/eco_reporte_app.dart';
+import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/repositorio_simulado.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'falsos.dart';
 
 /// Los cuatro estados de «Mis reportes» y el paso al detalle, en pantalla.
 /// (Este archivo se llama widget_test.dart a propósito: así `flutter create .`
 /// no lo reemplaza por la prueba del contador.)
 void main() {
+  late FuenteFotosFalsa fotos;
+
+  setUp(() => fotos = FuenteFotosFalsa());
+
   Future<RepositorioSimulado> abrirApp(
     WidgetTester tester,
     Escenario escenario,
@@ -16,7 +23,7 @@ void main() {
       ahora: DateTime(2026, 10, 13, 9),
     )..escenario = escenario;
     await tester.pumpWidget(
-      EcoReporteApp(repositorio: repositorio, simulado: repositorio),
+      EcoReporteApp(repositorio: repositorio, simulado: repositorio, fotos: fotos),
     );
     return repositorio;
   }
@@ -85,5 +92,31 @@ void main() {
     // Un desbordamiento lanzaría una excepción de renderizado.
     expect(tester.takeException(), isNull);
     expect(find.text('Ubicación aproximada'), findsOneWidget);
+  });
+
+  testWidgets('HU-01: «Reportar» abre el formulario con la foto', (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nuevo reporte'), findsOneWidget);
+    expect(find.text('Toca para tomar la foto *'), findsOneWidget);
+  });
+
+  testWidgets('HU-01: cámara denegada explica para qué es y ofrece la galería',
+      (WidgetTester tester) async {
+    fotos.alTomar = const CamaraDenegada();
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.pump();
+
+    expect(find.textContaining('estado real del lugar'), findsOneWidget);
+    expect(find.text('Elegir de la galería'), findsOneWidget);
   });
 }
