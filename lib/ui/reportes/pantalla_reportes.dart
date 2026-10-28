@@ -58,6 +58,13 @@ class PantallaReportes extends StatelessWidget {
         EstadoUi.listo => RefreshIndicator(
             onRefresh: vm.cargar,
             child: ListView.builder(
+              // HU-05 · «Volver a la lista»: la posición se guarda con esta
+              // llave y se recupera aunque la lista se vuelva a construir
+              // (por ejemplo, después de recargar).
+              key: const PageStorageKey<String>('mis-reportes'),
+              // RC-03: ListView.builder solo construye las filas visibles;
+              // con 200 reportes se dibujan unas 8, no 200. Sin itemExtent
+              // fijo a propósito: con letra grande la fila crece.
               // 96 abajo para que el botón flotante no tape la última fila.
               padding: const EdgeInsets.only(top: 6, bottom: 96),
               itemCount: vm.reportes.length,

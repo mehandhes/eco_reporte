@@ -16,6 +16,7 @@ class SelectorEscenario extends StatelessWidget {
         Escenario.vacio => 'Vacío',
         Escenario.falla => 'Falla al leer',
         Escenario.cargando => 'Cargando sin fin',
+        Escenario.doscientos => 'Doscientos reportes',
       };
 
   @override

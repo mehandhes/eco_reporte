@@ -261,4 +261,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Compartido'), findsOneWidget);
   });
+
+  testWidgets('HU-04: con 200 reportes la lista se dibuja sin errores y solo construye lo visible',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.doscientos);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    final int construidas = find.byType(Card).evaluate().length;
+    expect(construidas, greaterThan(0));
+    expect(construidas, lessThan(30), reason: 'ListView.builder no construye las 200');
+
+    await tester.fling(find.byType(ListView), const Offset(0, -3000), 3000);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('HU-05: al volver del detalle, la lista está en la misma posición',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.doscientos);
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView), const Offset(0, -1500));
+    await tester.pumpAndSettle();
+    final ScrollableState lista = tester.state(find.byType(Scrollable).first);
+    final double antes = lista.position.pixels;
+    expect(antes, greaterThan(0));
+
+    // Una fila que está en pantalla: la del centro.
+    await tester.tapAt(const Offset(400, 300));
+    await tester.pumpAndSettle();
+    expect(find.text('Fecha y hora'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    final ScrollableState despues = tester.state(find.byType(Scrollable).first);
+    expect(despues.position.pixels, antes);
+  });
 }
