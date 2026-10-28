@@ -16,8 +16,10 @@ void main() {
   late FuenteFotosFalsa fotos;
   late AlmacenFotosFalso almacen;
   late FuenteUbicacionFalsa ubicacion;
+  late ServicioCompartirFalso compartir;
 
   setUp(() {
+    compartir = ServicioCompartirFalso();
     fotos = FuenteFotosFalsa();
     almacen = AlmacenFotosFalso();
     ubicacion = FuenteUbicacionFalsa();
@@ -38,6 +40,7 @@ void main() {
         fotos: fotos,
         almacen: almacen,
         ubicacion: ubicacion,
+        compartir: compartir,
       ),
     );
     return repositorio;
@@ -236,5 +239,26 @@ void main() {
 
     expect(find.text('Ubicación aproximada'), findsOneWidget);
     expect(find.text('Pedir de nuevo'), findsOneWidget);
+  });
+
+  testWidgets('HU-10: compartir desde el detalle deja la marca en la lista',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Lote de la esquina'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Compartir por WhatsApp'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Compartir por WhatsApp'));
+    await tester.pumpAndSettle();
+
+    expect(compartir.veces, 1);
+    expect(compartir.ultimoTexto, contains('google.com/maps'));
+    expect(find.text('Compartido'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Compartido'), findsOneWidget);
   });
 }

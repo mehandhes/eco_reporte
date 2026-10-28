@@ -12,6 +12,10 @@ abstract interface class ReporteRepository {
   /// Guarda un borrador y devuelve el reporte con el id asignado (HU-03).
   /// Lanza [ErrorDeGuardado] si no se pudo escribir.
   Future<Reporte> guardar(BorradorReporte borrador);
+
+  /// Anota que el reporte [id] se compartió en [cuando] (HU-10) y devuelve
+  /// el reporte actualizado. Lanza [ErrorDeGuardado] si no se pudo.
+  Future<Reporte> marcarCompartido(int id, DateTime cuando);
 }
 
 /// Los reportes guardados no se pudieron leer.

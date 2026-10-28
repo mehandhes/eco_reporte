@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:eco_reporte/data/compartir/servicio_compartir.dart';
 import 'package:eco_reporte/data/fotos/almacen_fotos.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/reporte_repository.dart';
@@ -74,6 +75,32 @@ class RepositorioFalso implements ReporteRepository {
     final Reporte reporte = borrador.conId(reportes.length + 1);
     reportes.insert(0, reporte);
     return reporte;
+  }
+
+  @override
+  Future<Reporte> marcarCompartido(int id, DateTime cuando) async {
+    final int i = reportes.indexWhere((Reporte r) => r.id == id);
+    reportes[i] = reportes[i].compartido(cuando);
+    return reportes[i];
+  }
+}
+
+/// Menú de compartir falso: anota lo que se le pidió compartir.
+class ServicioCompartirFalso implements ServicioCompartir {
+  ResultadoCompartir resultado = ResultadoCompartir.compartido;
+  String? ultimoTexto;
+  String? ultimaFoto;
+  int veces = 0;
+
+  @override
+  Future<ResultadoCompartir> compartir({
+    required String texto,
+    String? rutaFoto,
+  }) async {
+    veces++;
+    ultimoTexto = texto;
+    ultimaFoto = rutaFoto;
+    return resultado;
   }
 }
 

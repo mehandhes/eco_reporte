@@ -1,21 +1,30 @@
 import 'dart:async';
 
+import 'package:eco_reporte/data/compartir/servicio_compartir.dart';
 import 'package:eco_reporte/data/repositorio_simulado.dart';
 import 'package:eco_reporte/domain/reporte.dart';
 import 'package:eco_reporte/ui/reportes/reportes_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'falsos.dart';
+
 /// Los escenarios de HU-04, comprobados sobre el ViewModel.
 void main() {
   late RepositorioSimulado repositorio;
+  late ServicioCompartirFalso compartir;
   late ReportesViewModel vm;
 
   setUp(() {
+    compartir = ServicioCompartirFalso();
     repositorio = RepositorioSimulado(
       retardo: Duration.zero,
       ahora: DateTime(2026, 10, 13, 9),
     );
-    vm = ReportesViewModel(repositorio);
+    vm = ReportesViewModel(
+      repositorio,
+      compartir: compartir,
+      reloj: () => DateTime(2026, 11, 9, 18),
+    );
   });
 
   tearDown(() => vm.dispose());
@@ -70,5 +79,37 @@ void main() {
     expect(vm.buscar(4)?.ubicacionAproximada, isTrue);
     expect(vm.buscar(5)?.tieneUbicacion, isFalse);
     expect(vm.buscar(99), isNull);
+  });
+
+  group('HU-10 · Compartir', () {
+    test('lleva la foto y el mensaje, y deja el reporte marcado', () async {
+      await vm.cargar();
+
+      final ResultadoCompartir resultado = await vm.compartir(1);
+
+      expect(resultado, ResultadoCompartir.compartido);
+      expect(compartir.ultimoTexto, contains('Lote de la esquina'));
+      expect(compartir.ultimoTexto, contains('google.com/maps'));
+      expect(vm.buscar(1)!.fueCompartido, isTrue);
+      expect(vm.buscar(1)!.compartidoEn, DateTime(2026, 11, 9, 18));
+    });
+
+    test('si cierra el menú sin elegir, no se marca', () async {
+      await vm.cargar();
+      compartir.resultado = ResultadoCompartir.cancelado;
+
+      await vm.compartir(1);
+
+      expect(vm.buscar(1)!.fueCompartido, isFalse);
+    });
+
+    test('la marca sobrevive a volver a cargar la lista', () async {
+      await vm.cargar();
+      await vm.compartir(2);
+
+      await vm.cargar();
+
+      expect(vm.buscar(2)!.fueCompartido, isTrue);
+    });
   });
 }

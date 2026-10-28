@@ -12,6 +12,7 @@ class Reporte {
     this.longitud,
     this.precisionMetros,
     this.rutaFoto,
+    this.compartidoEn,
   });
 
   /// Lo asigna SQLite al guardar. Un reporte sin id todavía es un
@@ -34,6 +35,25 @@ class Reporte {
   /// temporal: la foto se copia antes de guardar el reporte (HU-03).
   /// Nula solo en los datos simulados.
   final String? rutaFoto;
+
+  /// Cuándo se compartió por última vez (HU-10). Nulo si nunca.
+  /// Nació del hallazgo heurístico H1: la lista debe mostrar que ya se
+  /// compartió.
+  final DateTime? compartidoEn;
+
+  bool get fueCompartido => compartidoEn != null;
+
+  /// Copia del reporte marcada como compartida en [cuando].
+  Reporte compartido(DateTime cuando) => Reporte(
+        id: id,
+        fecha: fecha,
+        referencia: referencia,
+        latitud: latitud,
+        longitud: longitud,
+        precisionMetros: precisionMetros,
+        rutaFoto: rutaFoto,
+        compartidoEn: cuando,
+      );
 
   bool get tieneUbicacion => latitud != null && longitud != null;
 
@@ -60,6 +80,7 @@ class Reporte {
           precisionMetros: precisionMetros,
           rutaFoto: rutaFoto,
         ),
+        'compartido_ms': compartidoEn?.millisecondsSinceEpoch,
       };
 
   /// Reconstruye un reporte a partir de una fila de la tabla `reportes`.
@@ -72,6 +93,10 @@ class Reporte {
       longitud: (fila['longitud'] as num?)?.toDouble(),
       precisionMetros: (fila['precision_m'] as num?)?.toDouble(),
       rutaFoto: fila['ruta_foto'] as String?,
+      compartidoEn: switch (fila['compartido_ms']) {
+        final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
+        _ => null,
+      },
     );
   }
 

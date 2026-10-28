@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/compartir/servicio_compartir.dart';
 import '../../domain/reporte.dart';
 import '../comun/aviso.dart';
 import '../comun/formatos.dart';
 import '../reportes/reportes_viewmodel.dart';
 
 /// HU-05 · Detalle de un reporte: foto en grande, fecha y hora, y lugar.
+/// HU-10 · Desde aquí se comparte por WhatsApp (o cualquier otra app).
 class PantallaDetalle extends StatelessWidget {
   const PantallaDetalle({super.key, required this.id});
 
@@ -16,25 +18,59 @@ class PantallaDetalle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Reporte? reporte = context.watch<ReportesViewModel>().buscar(id);
+    final ReportesViewModel vm = context.watch<ReportesViewModel>();
+    final Reporte? reporte = vm.buscar(id);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reporte')),
+      appBar: AppBar(
+        title: const Text('Reporte'),
+        actions: <Widget>[
+          if (reporte != null)
+            IconButton(
+              tooltip: 'Compartir',
+              icon: const Icon(Icons.share_outlined),
+              onPressed: vm.compartiendo(id) ? null : () => _compartir(context, vm),
+            ),
+        ],
+      ),
       body: reporte == null
           ? const Aviso(
               icono: Icons.search_off,
               titulo: 'Este reporte ya no está',
               detalle: 'Vuelve a «Mis reportes» para ver los que tienes.',
             )
-          : _Contenido(reporte: reporte),
+          : _Contenido(
+              reporte: reporte,
+              compartiendo: vm.compartiendo(id),
+              alCompartir: () => _compartir(context, vm),
+            ),
     );
+  }
+
+  Future<void> _compartir(BuildContext context, ReportesViewModel vm) async {
+    final ScaffoldMessengerState mensajero = ScaffoldMessenger.of(context);
+    final ResultadoCompartir resultado = await vm.compartir(id);
+    if (resultado == ResultadoCompartir.fallido) {
+      mensajero.showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo abrir el menú de compartir. '
+              'Vuelve a intentarlo.'),
+        ),
+      );
+    }
   }
 }
 
 class _Contenido extends StatelessWidget {
-  const _Contenido({required this.reporte});
+  const _Contenido({
+    required this.reporte,
+    required this.compartiendo,
+    required this.alCompartir,
+  });
 
   final Reporte reporte;
+  final bool compartiendo;
+  final VoidCallback alCompartir;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +88,13 @@ class _Contenido extends StatelessWidget {
         children: <Widget>[
           _FotoGrande(rutaFoto: reporte.rutaFoto),
           const SizedBox(height: 16),
-          _Dato(icono: Icons.place_outlined, etiqueta: 'Lugar', valor: reporte.referencia),
+          _Dato(
+            icono: Icons.place_outlined,
+            etiqueta: 'Lugar',
+            valor: reporte.referencia.isEmpty
+                ? 'Sin referencia escrita'
+                : reporte.referencia,
+          ),
           _Dato(
             icono: Icons.my_location,
             etiqueta: 'Coordenadas',
@@ -68,8 +110,29 @@ class _Contenido extends StatelessWidget {
           _Dato(
             icono: Icons.event_outlined,
             etiqueta: 'Fecha y hora',
-            valor: '${formatearFecha(reporte.fecha)} · '
-                '${formatearHora(reporte.fecha)}',
+            valor: formatearFechaYHora(reporte.fecha),
+          ),
+          if (reporte.fueCompartido)
+            _Dato(
+              icono: Icons.mark_chat_read_outlined,
+              etiqueta: 'Compartido',
+              valor: formatearFechaYHora(reporte.compartidoEn!),
+            ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: compartiendo ? null : alCompartir,
+            icon: const Icon(Icons.share_outlined),
+            label: const Text('Compartir por WhatsApp'),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Si no tienes WhatsApp, puedes elegir otra app. Sin datos, '
+            'WhatsApp lo envía cuando vuelva la señal.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),

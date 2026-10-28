@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:eco_reporte/data/reporte_repository.dart';
 import 'package:eco_reporte/data/repositorio_sqlite.dart';
 import 'package:eco_reporte/domain/reporte.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// TEC-02 · El repositorio SQLite contra una base de verdad, en memoria.
@@ -111,5 +115,62 @@ void main() {
     expect(copia.referencia, original.referencia);
     expect(copia.ubicacionAproximada, isTrue);
     expect(copia.rutaFoto, original.rutaFoto);
+  });
+
+  test('HU-10: marcar como compartido queda guardado', () async {
+    final Reporte r = await repo.guardar(borrador(DateTime(2026, 11, 1), 'a'));
+
+    final Reporte marcado = await repo.marcarCompartido(r.id, DateTime(2026, 11, 2, 9));
+
+    expect(marcado.compartidoEn, DateTime(2026, 11, 2, 9));
+    expect((await repo.obtenerTodos()).single.fueCompartido, isTrue);
+  });
+
+  test('marcar un reporte que no existe es un ErrorDeGuardado', () async {
+    await expectLater(
+      repo.marcarCompartido(999, DateTime(2026, 11, 2)),
+      throwsA(isA<ErrorDeGuardado>()),
+    );
+  });
+
+  test('migración 1 → 2: los reportes del Sprint 2 sobreviven a la actualización', () async {
+    final Directory carpeta = await Directory.systemTemp.createTemp('eco_db_');
+    addTearDown(() => carpeta.delete(recursive: true));
+    final String ruta = p.join(carpeta.path, 'eco_reporte.db');
+
+    // Una base como la que dejó la versión 0.2.0 de la app (esquema 1).
+    final Database vieja = await databaseFactoryFfi.openDatabase(
+      ruta,
+      options: OpenDatabaseOptions(
+        version: 1,
+        onCreate: (Database db, int version) async {
+          await db.execute('''
+            CREATE TABLE reportes (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              fecha_ms INTEGER NOT NULL,
+              referencia TEXT NOT NULL DEFAULT '',
+              latitud REAL, longitud REAL, precision_m REAL, ruta_foto TEXT
+            )
+          ''');
+          await db.insert('reportes', <String, Object?>{
+            'fecha_ms': DateTime(2026, 10, 30).millisecondsSinceEpoch,
+            'referencia': 'del sprint 2',
+            'ruta_foto': '/app/fotos/1.jpg',
+          });
+        },
+      ),
+    );
+    await vieja.close();
+
+    final RepositorioSqlite nuevo =
+        RepositorioSqlite(fabrica: databaseFactoryFfi, ruta: ruta);
+    addTearDown(nuevo.cerrar);
+
+    final Reporte heredado = (await nuevo.obtenerTodos()).single;
+    expect(heredado.referencia, 'del sprint 2');
+    expect(heredado.fueCompartido, isFalse);
+
+    await nuevo.marcarCompartido(heredado.id, DateTime(2026, 11, 3));
+    expect((await nuevo.obtenerTodos()).single.fueCompartido, isTrue);
   });
 }

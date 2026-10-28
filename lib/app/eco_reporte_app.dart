@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../data/compartir/servicio_compartir.dart';
 import '../data/fotos/almacen_fotos.dart';
 import '../data/fotos/fuente_fotos.dart';
 import '../data/fotos/fuente_fotos_image_picker.dart';
@@ -22,6 +23,7 @@ class EcoReporteApp extends StatefulWidget {
     this.fotos,
     this.almacen,
     this.ubicacion,
+    this.compartir,
   });
 
   /// De dónde salen los reportes.
@@ -40,6 +42,9 @@ class EcoReporteApp extends StatefulWidget {
 
   /// GPS (HU-02). Nulo: el real, con geolocator.
   final FuenteUbicacion? ubicacion;
+
+  /// Menú de compartir (HU-10). Nulo: el del sistema, con share_plus.
+  final ServicioCompartir? compartir;
 
   @override
   State<EcoReporteApp> createState() => _EcoReporteAppState();
@@ -69,7 +74,10 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
         Provider<FuenteUbicacion>.value(value: _ubicacion),
         // '..cargar()' dispara la primera carga en cuanto se crea el ViewModel.
         ChangeNotifierProvider<ReportesViewModel>(
-          create: (_) => ReportesViewModel(widget.repositorio)..cargar(),
+          create: (_) => ReportesViewModel(
+            widget.repositorio,
+            compartir: widget.compartir ?? ServicioCompartirSharePlus(),
+          )..cargar(),
         ),
       ],
       child: MaterialApp.router(

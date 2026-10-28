@@ -41,7 +41,10 @@ class RepositorioSimulado implements ReporteRepository {
     if (escenario == Escenario.vacio) {
       return List<Reporte>.of(_guardados);
     }
-    final List<Reporte> lista = <Reporte>[..._guardados, ..._ejemplos()];
+    final List<Reporte> lista = <Reporte>[..._guardados, ..._ejemplos()]
+        .map((Reporte r) =>
+            _compartidos.containsKey(r.id) ? r.compartido(_compartidos[r.id]!) : r)
+        .toList();
     lista.sort((Reporte a, Reporte b) => b.fecha.compareTo(a.fecha));
     return lista;
   }
@@ -52,6 +55,16 @@ class RepositorioSimulado implements ReporteRepository {
     final Reporte reporte = borrador.conId(_siguienteId++);
     _guardados.insert(0, reporte);
     return reporte;
+  }
+
+  /// Las marcas de «compartido» de la sesión, por id.
+  final Map<int, DateTime> _compartidos = <int, DateTime>{};
+
+  @override
+  Future<Reporte> marcarCompartido(int id, DateTime cuando) async {
+    _compartidos[id] = cuando;
+    final List<Reporte> todos = <Reporte>[..._guardados, ..._ejemplos()];
+    return todos.firstWhere((Reporte r) => r.id == id).compartido(cuando);
   }
 
   /// Seis reportes verosímiles del barrio Primero de Mayo, en desorden a
