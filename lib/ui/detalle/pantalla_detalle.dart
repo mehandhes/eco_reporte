@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +50,7 @@ class _Contenido extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const _FotoGrande(),
+          _FotoGrande(rutaFoto: reporte.rutaFoto),
           const SizedBox(height: 16),
           _Dato(icono: Icons.place_outlined, etiqueta: 'Lugar', valor: reporte.referencia),
           _Dato(
@@ -75,30 +77,53 @@ class _Contenido extends StatelessWidget {
   }
 }
 
-/// Hueco de la foto en grande. La foto real llega con HU-01 y HU-03.
+/// La foto en grande (HU-05). Si el archivo ya no está, se dice en lugar
+/// de romper la pantalla.
 class _FotoGrande extends StatelessWidget {
-  const _FotoGrande();
+  const _FotoGrande({required this.rutaFoto});
+
+  final String? rutaFoto;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 4 / 3,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: rutaFoto == null
+            ? const _SinFoto(texto: 'Sin foto en los datos de prueba')
+            : Semantics(
+                image: true,
+                label: 'Foto del punto crítico',
+                child: Image.file(
+                  File(rutaFoto!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) =>
+                      const _SinFoto(texto: 'La foto ya no está en el teléfono'),
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _SinFoto extends StatelessWidget {
+  const _SinFoto({required this.texto});
+
+  final String texto;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colores = Theme.of(context).colorScheme;
-    return AspectRatio(
-      aspectRatio: 4 / 3,
-      child: Container(
-        decoration: BoxDecoration(
-          color: colores.secondaryContainer,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        alignment: Alignment.center,
+    return ColoredBox(
+      color: colores.secondaryContainer,
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Icon(Icons.photo_outlined, size: 56, color: colores.onSecondaryContainer),
             const SizedBox(height: 8),
-            Text(
-              'Sin foto en los datos de prueba',
-              style: TextStyle(color: colores.onSecondaryContainer),
-            ),
+            Text(texto, style: TextStyle(color: colores.onSecondaryContainer)),
           ],
         ),
       ),

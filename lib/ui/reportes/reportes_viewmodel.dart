@@ -46,6 +46,14 @@ class ReportesViewModel extends ChangeNotifier {
     _avisar();
   }
 
+  /// HU-03 · Un reporte recién guardado aparece de primero sin volver a
+  /// leer la base: es el más reciente.
+  void agregar(Reporte nuevo) {
+    _reportes = List<Reporte>.unmodifiable(<Reporte>[nuevo, ..._reportes]);
+    _estado = EstadoUi.listo;
+    _avisar();
+  }
+
   /// HU-05: el detalle sale de lo que la lista ya cargó.
   Reporte? buscar(int id) {
     for (final Reporte reporte in _reportes) {
