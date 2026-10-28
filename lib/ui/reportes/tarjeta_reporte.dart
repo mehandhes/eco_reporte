@@ -14,8 +14,10 @@ class TarjetaReporte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String cuando =
-        '${formatearFecha(reporte.fecha)} · ${formatearHora(reporte.fecha)}';
+    final String cuando = formatearFechaYHora(reporte.fecha);
+    final String titulo = reporte.referencia.isNotEmpty
+        ? reporte.referencia
+        : formatearCoordenadas(reporte);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       clipBehavior: Clip.antiAlias,
@@ -23,11 +25,29 @@ class TarjetaReporte extends StatelessWidget {
         minVerticalPadding: 12,
         leading: _Miniatura(rutaFoto: reporte.rutaFoto),
         title: Text(
-          reporte.referencia,
+          titulo,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text(cuando),
+        // Hallazgo H1 · la lista muestra qué reportes ya se compartieron.
+        subtitle: reporte.fueCompartido
+            ? Text.rich(
+                TextSpan(
+                  text: '$cuando · ',
+                  children: <InlineSpan>[
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Icon(
+                        Icons.mark_chat_read_outlined,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const TextSpan(text: ' Compartido'),
+                  ],
+                ),
+              )
+            : Text(cuando),
         trailing: const Icon(Icons.chevron_right),
         onTap: alPulsar,
       ),

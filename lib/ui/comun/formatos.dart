@@ -17,6 +17,10 @@ String formatearHora(DateTime fecha) {
   return '$hora:$minutos $sufijo';
 }
 
+/// «13 oct 2026 · 7:05 p. m.».
+String formatearFechaYHora(DateTime fecha) =>
+    '${formatearFecha(fecha)} · ${formatearHora(fecha)}';
+
 /// «7.06531, -73.85472»: cinco decimales, unos 1,1 m.
 String formatearPunto(double latitud, double longitud) =>
     '${latitud.toStringAsFixed(5)}, ${longitud.toStringAsFixed(5)}';

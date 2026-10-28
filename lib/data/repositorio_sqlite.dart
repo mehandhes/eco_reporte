@@ -18,7 +18,10 @@ class RepositorioSqlite implements ReporteRepository {
 
   /// Sube en uno cada vez que cambie el esquema, y `_migrar` dice cómo
   /// pasar de la versión anterior a la nueva.
-  static const int versionEsquema = 1;
+  ///
+  /// * 1 · Sprint 2: la tabla `reportes`.
+  /// * 2 · Sprint 3: columna `compartido_ms` (HU-10, hallazgo H1).
+  static const int versionEsquema = 2;
 
   final DatabaseFactory? _fabrica;
   final String? _ruta;
@@ -38,6 +41,7 @@ class RepositorioSqlite implements ReporteRepository {
       options: OpenDatabaseOptions(
         version: versionEsquema,
         onCreate: _crear,
+        onUpgrade: _migrar,
       ),
     );
   }
@@ -51,12 +55,23 @@ class RepositorioSqlite implements ReporteRepository {
         latitud      REAL,
         longitud     REAL,
         precision_m  REAL,
-        ruta_foto    TEXT
+        ruta_foto    TEXT,
+        compartido_ms INTEGER
       )
     ''');
     // «Mis reportes» siempre ordena por fecha: el índice lo hace barato
     // aunque haya cientos de filas (RC-03).
     await db.execute('CREATE INDEX idx_${tabla}_fecha ON $tabla (fecha_ms)');
+  }
+
+  /// Lleva una base vieja a la versión actual sin perder reportes. Corre
+  /// una vez, la primera vez que la versión nueva de la app abre la base.
+  /// Cada paso es un `if` (y no un `else if`): una base en la versión 1
+  /// pasa por todos los que le faltan.
+  static Future<void> _migrar(Database db, int anterior, int nueva) async {
+    if (anterior < 2) {
+      await db.execute('ALTER TABLE $tabla ADD COLUMN compartido_ms INTEGER');
+    }
   }
 
   @override
@@ -80,6 +95,27 @@ class RepositorioSqlite implements ReporteRepository {
       final Database db = await _base;
       final int id = await db.insert(tabla, borrador.aFila());
       return borrador.conId(id);
+    } catch (e) {
+      throw ErrorDeGuardado('$e');
+    }
+  }
+
+  @override
+  Future<Reporte> marcarCompartido(int id, DateTime cuando) async {
+    try {
+      final Database db = await _base;
+      final int cambiadas = await db.update(
+        tabla,
+        <String, Object?>{'compartido_ms': cuando.millisecondsSinceEpoch},
+        where: 'id = ?',
+        whereArgs: <Object>[id],
+      );
+      if (cambiadas == 0) throw ErrorDeGuardado('no existe el reporte $id');
+      final List<Map<String, Object?>> filas =
+          await db.query(tabla, where: 'id = ?', whereArgs: <Object>[id]);
+      return Reporte.desdeFila(filas.single);
+    } on ErrorDeGuardado {
+      rethrow;
     } catch (e) {
       throw ErrorDeGuardado('$e');
     }
