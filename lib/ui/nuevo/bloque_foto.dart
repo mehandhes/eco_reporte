@@ -21,20 +21,24 @@ class BloqueFoto extends StatelessWidget {
       children: <Widget>[
         AspectRatio(
           aspectRatio: 4 / 3,
-          // Ink fuera e InkWell dentro: al revés, la onda del toque quedaría
-          // pintada debajo del fondo y no se vería.
-          child: Ink(
-            decoration: BoxDecoration(
-              color: colores.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colores.outlineVariant),
-            ),
-            child: InkWell(
-              onTap: ocupado ? null : vm.tomarFoto,
-              borderRadius: BorderRadius.circular(12),
-              child: vm.rutaFoto == null
-                  ? _SinFoto(ocupado: ocupado)
-                  : _Miniatura(ruta: vm.rutaFoto!),
+          // MergeSemantics: TalkBack lee el área como UN botón, con su texto
+          // y su acción juntos (TEC-04 · accesibilidad).
+          child: MergeSemantics(
+            // Ink fuera e InkWell dentro: al revés, la onda del toque quedaría
+            // pintada debajo del fondo y no se vería.
+            child: Ink(
+              decoration: BoxDecoration(
+                color: colores.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colores.outlineVariant),
+              ),
+              child: InkWell(
+                onTap: ocupado ? null : vm.tomarFoto,
+                borderRadius: BorderRadius.circular(12),
+                child: vm.rutaFoto == null
+                    ? _SinFoto(ocupado: ocupado)
+                    : _Miniatura(ruta: vm.rutaFoto!),
+              ),
             ),
           ),
         ),
@@ -89,8 +93,6 @@ class _SinFoto extends StatelessWidget {
     final ColorScheme colores = Theme.of(context).colorScheme;
     return Semantics(
       button: true,
-      label: 'Tomar la foto del punto',
-      excludeSemantics: true,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
