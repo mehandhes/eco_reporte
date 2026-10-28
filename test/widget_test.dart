@@ -114,9 +114,26 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Toca para tomar la foto *'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.textContaining('estado real del lugar'), findsOneWidget);
     expect(find.text('Elegir de la galería'), findsOneWidget);
+  });
+
+  testWidgets('HU-12: la referencia no pasa de 120 caracteres y dice cuánto queda',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Te quedan 120 caracteres'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'x' * 130);
+    await tester.pump();
+
+    final EditableText campo = tester.widget(find.byType(EditableText));
+    expect(campo.controller.text.length, 120);
+    expect(find.text('Llegaste al límite de 120 caracteres'), findsOneWidget);
   });
 }

@@ -78,4 +78,23 @@ void main() {
       expect(vm.rutaFoto, '/tmp/recuperada.jpg');
     });
   });
+
+  group('HU-12 · Referencia del lugar', () {
+    test('Sin ubicación, la referencia es obligatoria', () {
+      expect(vm.referenciaObligatoria, isTrue);
+      expect(vm.errorReferencia, isNull, reason: 'no se regaña antes de intentar');
+
+      expect(vm.validar(), isFalse);
+      expect(vm.errorReferencia, isNotNull);
+
+      vm.referencia = 'frente a la cancha, junto al poste';
+      expect(vm.errorReferencia, isNull);
+      expect(vm.validar(), isTrue);
+    });
+
+    test('Solo espacios no cuenta como referencia', () {
+      vm.referencia = '    ';
+      expect(vm.validar(), isFalse);
+    });
+  });
 }

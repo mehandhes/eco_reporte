@@ -3,9 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../../data/fotos/fuente_fotos.dart';
 import 'bloque_foto.dart';
+import 'campo_referencia.dart';
 import 'nuevo_reporte_viewmodel.dart';
 
-/// Formulario «Nuevo reporte». Sprint 2: HU-01 (foto).
+/// Formulario «Nuevo reporte». Sprint 2: HU-01 (foto) y HU-12 (referencia).
 class PantallaNuevoReporte extends StatelessWidget {
   const PantallaNuevoReporte({super.key});
 
@@ -34,6 +35,8 @@ class _Formulario extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: <Widget>[
           BloqueFoto(vm: vm),
+          const SizedBox(height: 24),
+          CampoReferencia(vm: vm),
         ],
       ),
     );
