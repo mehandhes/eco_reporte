@@ -121,6 +121,18 @@ class RepositorioSqlite implements ReporteRepository {
     }
   }
 
+  @override
+  Future<void> eliminar(int id) async {
+    try {
+      final Database db = await _base;
+      // Siempre con whereArgs, nunca pegando el valor en el texto del SQL:
+      // así no hay inyección posible (OWASP M4).
+      await db.delete(tabla, where: 'id = ?', whereArgs: <Object>[id]);
+    } catch (e) {
+      throw ErrorDeGuardado('$e');
+    }
+  }
+
   /// Cierra la base. Solo lo usan las pruebas.
   Future<void> cerrar() async {
     final Future<Database>? abriendo = _abriendo;

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eco_reporte/data/compartir/servicio_compartir.dart';
 import 'package:eco_reporte/data/fotos/almacen_fotos.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
+import 'package:eco_reporte/data/preferencias/preferencias_app.dart';
 import 'package:eco_reporte/data/reporte_repository.dart';
 import 'package:eco_reporte/data/ubicacion/fuente_ubicacion.dart';
 import 'package:eco_reporte/domain/reporte.dart';
@@ -83,6 +84,10 @@ class RepositorioFalso implements ReporteRepository {
     reportes[i] = reportes[i].compartido(cuando);
     return reportes[i];
   }
+
+  @override
+  Future<void> eliminar(int id) async =>
+      reportes.removeWhere((Reporte r) => r.id == id);
 }
 
 /// Menú de compartir falso: anota lo que se le pidió compartir.
@@ -134,3 +139,17 @@ const UbicacionObtenida buenaSenal = UbicacionObtenida(
   longitud: -73.85472,
   precisionMetros: 8,
 );
+
+/// Preferencias en memoria. Por omisión el aviso ya se aceptó, para que las
+/// pruebas de los sprints anteriores vayan directo al formulario.
+class PreferenciasFalsas implements PreferenciasApp {
+  PreferenciasFalsas({this.aceptado = true});
+
+  bool aceptado;
+
+  @override
+  Future<bool> avisoPrivacidadAceptado() async => aceptado;
+
+  @override
+  Future<void> aceptarAvisoPrivacidad() async => aceptado = true;
+}

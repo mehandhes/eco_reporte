@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import '../ui/detalle/pantalla_detalle.dart';
 import '../ui/nuevo/pantalla_nuevo_reporte.dart';
+import '../ui/privacidad/pantalla_privacidad.dart';
 import '../ui/reportes/pantalla_reportes.dart';
 
 /// Todas las rutas de la app. El formulario y el detalle son hijos de '/'
@@ -20,6 +21,14 @@ GoRouter crearEnrutador() => GoRouter(
             GoRoute(
               path: 'nuevo',
               builder: (context, state) => const PantallaNuevoReporte(),
+            ),
+            GoRoute(
+              // TEC-05 · '/privacidad?primera=1' antes del primer reporte.
+              path: 'privacidad',
+              builder: (context, state) => PantallaPrivacidad(
+                antesDelPrimerReporte:
+                    state.uri.queryParameters['primera'] == '1',
+              ),
             ),
             GoRoute(
               path: 'reporte/:id',

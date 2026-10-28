@@ -67,10 +67,19 @@ class RepositorioSimulado implements ReporteRepository {
     return _todos().firstWhere((Reporte r) => r.id == id).compartido(cuando);
   }
 
+  /// Los ids borrados durante la sesión.
+  final Set<int> _borrados = <int>{};
+
+  @override
+  Future<void> eliminar(int id) async {
+    _borrados.add(id);
+    _guardados.removeWhere((Reporte r) => r.id == id);
+  }
+
   List<Reporte> _todos() => <Reporte>[
         ..._guardados,
         ...(escenario == Escenario.doscientos ? _doscientos() : _ejemplos()),
-      ];
+      ].where((Reporte r) => !_borrados.contains(r.id)).toList();
 
   /// RC-03 · 200 reportes para medir «Mis reportes» en un Android de gama
   /// de entrada: `flutter run --profile --dart-define=DATOS=simulados`,

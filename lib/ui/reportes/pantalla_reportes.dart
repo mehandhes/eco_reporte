@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../data/repositorio_simulado.dart';
 import '../../domain/reporte.dart';
 import '../comun/aviso.dart';
+import '../privacidad/privacidad_viewmodel.dart';
 import 'reportes_viewmodel.dart';
 import 'selector_escenario.dart';
 import 'tarjeta_reporte.dart';
@@ -24,6 +25,11 @@ class PantallaReportes extends StatelessWidget {
         title: const Text('Mis reportes'),
         actions: <Widget>[
           if (simulado != null) SelectorEscenario(repositorio: simulado),
+          IconButton(
+            tooltip: 'Privacidad',
+            icon: const Icon(Icons.privacy_tip_outlined),
+            onPressed: () => context.push('/privacidad'),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -81,8 +87,13 @@ class PantallaReportes extends StatelessWidget {
     );
   }
 
-  /// HU-01 · Abre el formulario «Nuevo reporte».
-  void _crearReporte(BuildContext context) {
+  /// HU-01 · Abre el formulario «Nuevo reporte». La primera vez pasa antes
+  /// por el aviso de privacidad (TEC-05, RC-06).
+  Future<void> _crearReporte(BuildContext context) async {
+    if (!context.read<PrivacidadViewModel>().aceptado) {
+      final bool? sigue = await context.push<bool>('/privacidad?primera=1');
+      if (sigue != true || !context.mounted) return;
+    }
     context.push('/nuevo');
   }
 }
