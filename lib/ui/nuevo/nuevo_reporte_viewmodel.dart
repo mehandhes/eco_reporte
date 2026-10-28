@@ -3,7 +3,29 @@ import 'package:flutter/foundation.dart';
 import '../../data/fotos/almacen_fotos.dart';
 import '../../data/fotos/fuente_fotos.dart';
 import '../../data/reporte_repository.dart';
+import '../../data/ubicacion/fuente_ubicacion.dart';
 import '../../domain/reporte.dart';
+
+/// HU-02 · En qué va la ubicación del formulario.
+enum EstadoUbicacion {
+  /// Pidiendo la posición: «Buscando tu ubicación…».
+  buscando,
+
+  /// Hay coordenadas (quizá aproximadas).
+  obtenida,
+
+  /// Se negó el permiso; se puede volver a pedir.
+  sinPermiso,
+
+  /// Se negó para siempre: solo desde los ajustes de la app.
+  bloqueada,
+
+  /// El GPS del teléfono está apagado.
+  gpsApagado,
+
+  /// La señal no llegó a tiempo.
+  sinSenal,
+}
 
 /// ViewModel del formulario «Nuevo reporte».
 ///
@@ -15,13 +37,16 @@ class NuevoReporteViewModel extends ChangeNotifier {
     required FuenteFotos fotos,
     required AlmacenFotos almacen,
     required ReporteRepository repositorio,
+    required FuenteUbicacion ubicacion,
     DateTime Function()? reloj,
   })  : _fotos = fotos,
         _almacen = almacen,
         _repositorio = repositorio,
+        _ubicacion = ubicacion,
         _reloj = reloj ?? DateTime.now;
 
   final FuenteFotos _fotos;
+  final FuenteUbicacion _ubicacion;
   final AlmacenFotos _almacen;
   final ReporteRepository _repositorio;
 
@@ -93,6 +118,75 @@ class NuevoReporteViewModel extends ChangeNotifier {
     }
   }
 
+  // ---------------------------------------------------------------- HU-02
+  /// HU-02 · «Una ubicación imprecisa se avisa, no se oculta».
+  static const double precisionAceptable = 50;
+
+  EstadoUbicacion _estadoUbicacion = EstadoUbicacion.buscando;
+  double? _latitud;
+  double? _longitud;
+  double? _precision;
+  bool _buscandoAhora = false;
+
+  EstadoUbicacion get estadoUbicacion => _estadoUbicacion;
+  double? get latitud => _latitud;
+  double? get longitud => _longitud;
+  double? get precisionMetros => _precision;
+
+  bool get tieneUbicacion => _latitud != null && _longitud != null;
+  bool get buscandoUbicacion => _estadoUbicacion == EstadoUbicacion.buscando;
+
+  bool get ubicacionAproximada =>
+      tieneUbicacion && (_precision ?? 0) > precisionAceptable;
+
+  /// Se llama al abrir el formulario (la ubicación «se toma sola») y cada
+  /// vez que la vecina pide «Intentar de nuevo». Mientras tanto puede tomar
+  /// la foto y escribir: nada se bloquea.
+  Future<void> buscarUbicacion() async {
+    if (_buscandoAhora) return;
+    _buscandoAhora = true;
+    _estadoUbicacion = EstadoUbicacion.buscando;
+    _avisar();
+
+    ResultadoUbicacion resultado;
+    try {
+      resultado = await _ubicacion.obtener();
+    } catch (e) {
+      debugPrint('La ubicación falló: $e');
+      resultado = const SinSenalGps();
+    }
+
+    switch (resultado) {
+      case UbicacionObtenida(
+          :final double latitud,
+          :final double longitud,
+          :final double precisionMetros,
+        ):
+        _latitud = latitud;
+        _longitud = longitud;
+        _precision = precisionMetros;
+        _estadoUbicacion = EstadoUbicacion.obtenida;
+      case SinPermisoDeUbicacion(:final bool bloqueado):
+        _estadoUbicacion =
+            bloqueado ? EstadoUbicacion.bloqueada : EstadoUbicacion.sinPermiso;
+      case GpsApagado():
+        _estadoUbicacion = EstadoUbicacion.gpsApagado;
+      case SinSenalGps():
+        _estadoUbicacion = EstadoUbicacion.sinSenal;
+    }
+    // Si un reintento falla, se conserva la ubicación que ya había.
+    if (_estadoUbicacion != EstadoUbicacion.obtenida && tieneUbicacion) {
+      _estadoUbicacion = EstadoUbicacion.obtenida;
+    }
+    _buscandoAhora = false;
+    _avisar();
+  }
+
+  Future<void> abrirAjustesDeLaApp() => _ubicacion.abrirAjustesDeLaApp();
+
+  Future<void> abrirAjustesDeUbicacion() =>
+      _ubicacion.abrirAjustesDeUbicacion();
+
   // ---------------------------------------------------------------- HU-12
   /// Límite de la referencia. Cabe en una línea de WhatsApp y en el
   /// listado de la JAC.
@@ -112,9 +206,9 @@ class NuevoReporteViewModel extends ChangeNotifier {
   }
 
   /// HU-12 · Sin ubicación, la referencia es lo único que dirá dónde está
-  /// el punto. Hasta que llegue HU-02 (Sprint 3) el formulario no tiene
-  /// ubicación, así que la referencia es siempre obligatoria.
-  bool get referenciaObligatoria => true;
+  /// el punto: entonces es obligatoria. Con ubicación es opcional (pero
+  /// ayuda, sobre todo si la ubicación es aproximada).
+  bool get referenciaObligatoria => !tieneUbicacion;
 
   bool get faltaReferencia =>
       referenciaObligatoria && _referencia.trim().isEmpty;
@@ -168,6 +262,9 @@ class NuevoReporteViewModel extends ChangeNotifier {
           fecha: _reloj(),
           referencia: _referencia.trim(),
           rutaFoto: rutaPermanente,
+          latitud: _latitud,
+          longitud: _longitud,
+          precisionMetros: _precision,
         ),
       );
       // Queda en «guardando» a propósito: la pantalla se va a cerrar y

@@ -5,14 +5,17 @@ import 'package:provider/provider.dart';
 import '../../data/fotos/almacen_fotos.dart';
 import '../../data/fotos/fuente_fotos.dart';
 import '../../data/reporte_repository.dart';
+import '../../data/ubicacion/fuente_ubicacion.dart';
 import '../../domain/reporte.dart';
 import '../reportes/reportes_viewmodel.dart';
 import 'bloque_foto.dart';
+import 'bloque_ubicacion.dart';
 import 'campo_referencia.dart';
 import 'nuevo_reporte_viewmodel.dart';
 
 /// Formulario «Nuevo reporte».
 /// Sprint 2: HU-01 (foto), HU-12 (referencia) y HU-03 (guardar).
+/// Sprint 3: HU-02 (ubicación automática).
 class PantallaNuevoReporte extends StatelessWidget {
   const PantallaNuevoReporte({super.key});
 
@@ -24,7 +27,11 @@ class PantallaNuevoReporte extends StatelessWidget {
         fotos: context.read<FuenteFotos>(),
         almacen: context.read<AlmacenFotos>(),
         repositorio: context.read<ReporteRepository>(),
-      )..recuperarFotoPerdida(),
+        ubicacion: context.read<FuenteUbicacion>(),
+      )
+        ..recuperarFotoPerdida()
+        // HU-02 · «La ubicación se toma sola al abrir el formulario».
+        ..buscarUbicacion(),
       child: const _Formulario(),
     );
   }
@@ -43,6 +50,8 @@ class _Formulario extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: <Widget>[
           BloqueFoto(vm: vm),
+          const SizedBox(height: 16),
+          BloqueUbicacion(vm: vm),
           const SizedBox(height: 24),
           CampoReferencia(vm: vm),
           if (vm.errorGuardado != null) ...<Widget>[

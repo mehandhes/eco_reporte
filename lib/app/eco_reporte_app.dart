@@ -7,6 +7,8 @@ import '../data/fotos/fuente_fotos.dart';
 import '../data/fotos/fuente_fotos_image_picker.dart';
 import '../data/reporte_repository.dart';
 import '../data/repositorio_simulado.dart';
+import '../data/ubicacion/fuente_ubicacion.dart';
+import '../data/ubicacion/fuente_ubicacion_geolocator.dart';
 import '../ui/reportes/reportes_viewmodel.dart';
 import 'enrutador.dart';
 import 'tema.dart';
@@ -19,6 +21,7 @@ class EcoReporteApp extends StatefulWidget {
     this.simulado,
     this.fotos,
     this.almacen,
+    this.ubicacion,
   });
 
   /// De dónde salen los reportes.
@@ -35,6 +38,9 @@ class EcoReporteApp extends StatefulWidget {
   /// Carpeta de las fotos guardadas (HU-03). Nulo: la carpeta de la app.
   final AlmacenFotos? almacen;
 
+  /// GPS (HU-02). Nulo: el real, con geolocator.
+  final FuenteUbicacion? ubicacion;
+
   @override
   State<EcoReporteApp> createState() => _EcoReporteAppState();
 }
@@ -43,6 +49,8 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
   late final GoRouter _enrutador = crearEnrutador();
   late final FuenteFotos _fotos = widget.fotos ?? FuenteFotosImagePicker();
   late final AlmacenFotos _almacen = widget.almacen ?? AlmacenFotosLocal();
+  late final FuenteUbicacion _ubicacion =
+      widget.ubicacion ?? FuenteUbicacionGeolocator();
 
   @override
   void dispose() {
@@ -58,6 +66,7 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
         Provider<RepositorioSimulado?>.value(value: widget.simulado),
         Provider<FuenteFotos>.value(value: _fotos),
         Provider<AlmacenFotos>.value(value: _almacen),
+        Provider<FuenteUbicacion>.value(value: _ubicacion),
         // '..cargar()' dispara la primera carga en cuanto se crea el ViewModel.
         ChangeNotifierProvider<ReportesViewModel>(
           create: (_) => ReportesViewModel(widget.repositorio)..cargar(),

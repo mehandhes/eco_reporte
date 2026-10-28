@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:eco_reporte/app/eco_reporte_app.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/repositorio_simulado.dart';
+import 'package:eco_reporte/data/ubicacion/fuente_ubicacion.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -12,10 +15,12 @@ import 'falsos.dart';
 void main() {
   late FuenteFotosFalsa fotos;
   late AlmacenFotosFalso almacen;
+  late FuenteUbicacionFalsa ubicacion;
 
   setUp(() {
     fotos = FuenteFotosFalsa();
     almacen = AlmacenFotosFalso();
+    ubicacion = FuenteUbicacionFalsa();
   });
 
   Future<RepositorioSimulado> abrirApp(
@@ -32,6 +37,7 @@ void main() {
         simulado: repositorio,
         fotos: fotos,
         almacen: almacen,
+        ubicacion: ubicacion,
       ),
     );
     return repositorio;
@@ -183,5 +189,52 @@ void main() {
     expect(find.textContaining('Falta la foto'), findsOneWidget);
     expect(find.textContaining('Escribe una referencia'), findsOneWidget);
     expect(almacen.guardadas, isEmpty);
+  });
+
+  testWidgets('HU-02: al abrir el formulario se busca la ubicación sola',
+      (WidgetTester tester) async {
+    ubicacion.enCurso = Completer<ResultadoUbicacion>();
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    // No pumpAndSettle: el indicador de progreso gira sin parar.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('Buscando tu ubicación…'), findsOneWidget);
+    expect(ubicacion.veces, 1);
+
+    ubicacion.enCurso!.complete(buenaSenal);
+    await tester.pumpAndSettle();
+    expect(find.text('Ubicación lista'), findsOneWidget);
+    expect(find.textContaining('7.06531, -73.85472'), findsOneWidget);
+  });
+
+  testWidgets('HU-02: sin permiso, dice para qué es y deja reportar con referencia',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sin permiso de ubicación'), findsOneWidget);
+    expect(find.textContaining('una sola vez, mientras llenas este reporte'), findsOneWidget);
+    expect(find.text('Referencia del lugar *'), findsOneWidget);
+  });
+
+  testWidgets('HU-02: precisión peor que 50 m muestra «Ubicación aproximada»',
+      (WidgetTester tester) async {
+    ubicacion.resultado = const UbicacionObtenida(
+      latitud: 7.06244,
+      longitud: -73.85155,
+      precisionMetros: 64,
+    );
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ubicación aproximada'), findsOneWidget);
+    expect(find.text('Pedir de nuevo'), findsOneWidget);
   });
 }

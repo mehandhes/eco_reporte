@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eco_reporte/data/fotos/almacen_fotos.dart';
 import 'package:eco_reporte/data/fotos/fuente_fotos.dart';
 import 'package:eco_reporte/data/reporte_repository.dart';
+import 'package:eco_reporte/data/ubicacion/fuente_ubicacion.dart';
 import 'package:eco_reporte/domain/reporte.dart';
 
 /// Dobles de prueba compartidos. Responden lo que cada prueba les pida, sin
@@ -75,3 +76,34 @@ class RepositorioFalso implements ReporteRepository {
     return reporte;
   }
 }
+
+/// GPS falso. Por omisión, sin permiso: así la referencia es obligatoria y
+/// las pruebas del Sprint 2 siguen valiendo tal cual.
+class FuenteUbicacionFalsa implements FuenteUbicacion {
+  ResultadoUbicacion resultado = const SinPermisoDeUbicacion(bloqueado: false);
+  int veces = 0;
+  int ajustesApp = 0;
+  int ajustesUbicacion = 0;
+
+  /// Si no es nulo, la búsqueda espera a que se complete.
+  Completer<ResultadoUbicacion>? enCurso;
+
+  @override
+  Future<ResultadoUbicacion> obtener() {
+    veces++;
+    return enCurso?.future ?? Future<ResultadoUbicacion>.value(resultado);
+  }
+
+  @override
+  Future<void> abrirAjustesDeLaApp() async => ajustesApp++;
+
+  @override
+  Future<void> abrirAjustesDeUbicacion() async => ajustesUbicacion++;
+}
+
+/// Una ubicación buena, en el barrio Primero de Mayo.
+const UbicacionObtenida buenaSenal = UbicacionObtenida(
+  latitud: 7.06531,
+  longitud: -73.85472,
+  precisionMetros: 8,
+);
