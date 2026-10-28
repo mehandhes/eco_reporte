@@ -6,7 +6,7 @@
 **Épicas:** Base (técnicas) · Reportar · Consultar · Sincronizar · Comunidad.
 **Historia de referencia:** HU-05 «abrir el detalle de un reporte» = **2 puntos**. Escala: 1, 2, 3, 5, 8. Nada de 13.
 
-## Plan de cierre · estado al final del Sprint 2
+## Plan de cierre · estado al final del Sprint 3
 
 El curso se cierra en tres sprints (`docs/plan-de-cierre.md`). Esta tabla manda sobre las de abajo, que quedan como
 historia del refinamiento.
@@ -14,14 +14,14 @@ historia del refinamiento.
 | ID | Elemento | Pts | Sprint | Estado |
 |---|---|---|---|---|
 | TEC-01 | Proyecto Flutter con `material_ui` | 2 | 0 | Hecho |
-| TEC-02 | Modelo `Reporte` y repositorio SQLite | 3 | 2 | En dispositivo · falta la comprobación en Android |
-| HU-01 | Tomar la foto del punto crítico | 3 | 2 | En dispositivo · falta la comprobación en Android |
-| HU-12 | Referencia del lugar | 2 | 2 | En dispositivo · falta la comprobación en Android |
-| HU-03 | Guardar el reporte en el teléfono | 3 | 2 | En dispositivo · falta la comprobación en Android |
-| HU-02 | Ubicación automática | 3 | 3 | Listo |
-| HU-04 | Lista de mis reportes | 3 | 3 | Listo (base hecha en INV-04) |
-| HU-05 | Detalle de un reporte | 2 | 3 | Listo (base hecha en INV-04) |
-| HU-10 | Compartir por WhatsApp | 2 | 3 | Listo |
+| TEC-02 | Modelo `Reporte` y repositorio SQLite | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
+| HU-01 | Tomar la foto del punto crítico | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
+| HU-12 | Referencia del lugar | 2 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
+| HU-03 | Guardar el reporte en el teléfono | 3 | 2 | Hecho si pasó la comprobación en Android del primer día del Sprint 3 |
+| HU-02 | Ubicación automática | 3 | 3 | Fusionado · falta la comprobación en Android |
+| HU-04 | Lista de mis reportes | 3 | 3 | Fusionado · falta medir RC-03 en el teléfono |
+| HU-05 | Detalle de un reporte | 2 | 3 | Fusionado · falta la comprobación en Android |
+| HU-10 | Compartir por WhatsApp | 2 | 3 | Fusionado · falta enviarlo a un contacto real |
 | TEC-04 | Calidad: plan de pruebas, accesibilidad, medición en gama de entrada | 3 | 4 | Backlog |
 | TEC-05 | Seguridad y privacidad (OWASP Mobile Top 10, Ley 1581) | 3 | 4 | Backlog |
 | TEC-06 | Build de release firmado | 2 | 4 | Backlog |
