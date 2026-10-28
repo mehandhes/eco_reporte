@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,17 @@ class PantallaInicio extends StatelessWidget {
     final ThemeData tema = Theme.of(context);
     final ReportesViewModel vm = context.watch<ReportesViewModel>();
 
-    return Scaffold(
+    // Sin barra superior, la franja de la hora toma el color de la página
+    // (y no un gris que la corta) con iconos que se leen en claro y oscuro.
+    final SystemUiOverlayStyle franja =
+        (tema.brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark)
+            .copyWith(statusBarColor: Colors.transparent);
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: franja,
+      child: Scaffold(
       bottomNavigationBar: const _BarraReportar(),
       body: SafeArea(
         child: ListView(
@@ -91,6 +102,7 @@ class PantallaInicio extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
