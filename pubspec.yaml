@@ -1,7 +1,7 @@
 name: eco_reporte
 description: Reporte ciudadano de puntos críticos de residuos (ODS 11, Barrancabermeja). Proyecto modelo del curso DAM · UNIPAZ.
 publish_to: 'none'
-version: 0.3.0+3
+version: 1.0.0+4
 
 environment:
   sdk: ^3.13.0
