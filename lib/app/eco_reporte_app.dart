@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../data/fotos/almacen_fotos.dart';
 import '../data/fotos/fuente_fotos.dart';
 import '../data/fotos/fuente_fotos_image_picker.dart';
 import '../data/reporte_repository.dart';
@@ -17,6 +18,7 @@ class EcoReporteApp extends StatefulWidget {
     required this.repositorio,
     this.simulado,
     this.fotos,
+    this.almacen,
   });
 
   /// De dónde salen los reportes.
@@ -30,6 +32,9 @@ class EcoReporteApp extends StatefulWidget {
   /// pasan una falsa.
   final FuenteFotos? fotos;
 
+  /// Carpeta de las fotos guardadas (HU-03). Nulo: la carpeta de la app.
+  final AlmacenFotos? almacen;
+
   @override
   State<EcoReporteApp> createState() => _EcoReporteAppState();
 }
@@ -37,6 +42,7 @@ class EcoReporteApp extends StatefulWidget {
 class _EcoReporteAppState extends State<EcoReporteApp> {
   late final GoRouter _enrutador = crearEnrutador();
   late final FuenteFotos _fotos = widget.fotos ?? FuenteFotosImagePicker();
+  late final AlmacenFotos _almacen = widget.almacen ?? AlmacenFotosLocal();
 
   @override
   void dispose() {
@@ -51,6 +57,7 @@ class _EcoReporteAppState extends State<EcoReporteApp> {
         Provider<ReporteRepository>.value(value: widget.repositorio),
         Provider<RepositorioSimulado?>.value(value: widget.simulado),
         Provider<FuenteFotos>.value(value: _fotos),
+        Provider<AlmacenFotos>.value(value: _almacen),
         // '..cargar()' dispara la primera carga en cuanto se crea el ViewModel.
         ChangeNotifierProvider<ReportesViewModel>(
           create: (_) => ReportesViewModel(widget.repositorio)..cargar(),

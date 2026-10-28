@@ -11,8 +11,12 @@ import 'falsos.dart';
 /// no lo reemplaza por la prueba del contador.)
 void main() {
   late FuenteFotosFalsa fotos;
+  late AlmacenFotosFalso almacen;
 
-  setUp(() => fotos = FuenteFotosFalsa());
+  setUp(() {
+    fotos = FuenteFotosFalsa();
+    almacen = AlmacenFotosFalso();
+  });
 
   Future<RepositorioSimulado> abrirApp(
     WidgetTester tester,
@@ -23,7 +27,12 @@ void main() {
       ahora: DateTime(2026, 10, 13, 9),
     )..escenario = escenario;
     await tester.pumpWidget(
-      EcoReporteApp(repositorio: repositorio, simulado: repositorio, fotos: fotos),
+      EcoReporteApp(
+        repositorio: repositorio,
+        simulado: repositorio,
+        fotos: fotos,
+        almacen: almacen,
+      ),
     );
     return repositorio;
   }
@@ -135,5 +144,44 @@ void main() {
     final EditableText campo = tester.widget(find.byType(EditableText));
     expect(campo.controller.text.length, 120);
     expect(find.text('Llegaste al límite de 120 caracteres'), findsOneWidget);
+  });
+
+  testWidgets('HU-03: guardar confirma qué sigue y el reporte queda de primero',
+      (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Toca para tomar la foto *'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), 'Frente a la cancha, junto al poste');
+    await tester.ensureVisible(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mis reportes'), findsOneWidget);
+    expect(find.textContaining('compartirlo con tu JAC'), findsOneWidget);
+    final double nuevo = tester.getTopLeft(find.text('Frente a la cancha, junto al poste')).dy;
+    final double anterior = tester.getTopLeft(find.textContaining('Lote de la esquina')).dy;
+    expect(nuevo, lessThan(anterior));
+  });
+
+  testWidgets('HU-03: sin foto no se guarda y se dice qué falta', (WidgetTester tester) async {
+    await abrirApp(tester, Escenario.conDatos);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reportar'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar reporte'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nuevo reporte'), findsOneWidget);
+    expect(find.textContaining('Falta la foto'), findsOneWidget);
+    expect(find.textContaining('Escribe una referencia'), findsOneWidget);
+    expect(almacen.guardadas, isEmpty);
   });
 }

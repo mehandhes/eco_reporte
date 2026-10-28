@@ -14,7 +14,7 @@ class BloqueFoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colores = Theme.of(context).colorScheme;
-    final bool ocupado = vm.pidiendoFoto;
+    final bool ocupado = vm.pidiendoFoto || vm.guardando;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,6 +65,15 @@ class BloqueFoto extends StatelessWidget {
                 'teléfono o elegir una foto de la galería.',
           ),
         if (vm.avisoFoto != null) _Explicacion(texto: vm.avisoFoto!),
+        if (vm.errorFoto != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              vm.errorFoto!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: colores.error),
+            ),
+          ),
       ],
     );
   }

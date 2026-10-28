@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 
+import '../../data/fotos/almacen_fotos.dart';
 import '../../data/fotos/fuente_fotos.dart';
+import '../../data/reporte_repository.dart';
+import '../../domain/reporte.dart';
 
 /// ViewModel del formulario «Nuevo reporte».
 ///
@@ -8,9 +11,22 @@ import '../../data/fotos/fuente_fotos.dart';
 /// pasa a segundo plano, este objeto sigue en memoria con todo lo llenado
 /// (HU-01 · «Una llamada a mitad del formulario»).
 class NuevoReporteViewModel extends ChangeNotifier {
-  NuevoReporteViewModel({required FuenteFotos fotos}) : _fotos = fotos;
+  NuevoReporteViewModel({
+    required FuenteFotos fotos,
+    required AlmacenFotos almacen,
+    required ReporteRepository repositorio,
+    DateTime Function()? reloj,
+  })  : _fotos = fotos,
+        _almacen = almacen,
+        _repositorio = repositorio,
+        _reloj = reloj ?? DateTime.now;
 
   final FuenteFotos _fotos;
+  final AlmacenFotos _almacen;
+  final ReporteRepository _repositorio;
+
+  /// Se inyecta para que las pruebas controlen la fecha del reporte.
+  final DateTime Function() _reloj;
 
   // ---------------------------------------------------------------- HU-01
   String? _rutaFoto;
@@ -37,7 +53,7 @@ class NuevoReporteViewModel extends ChangeNotifier {
   Future<void> elegirDeGaleria() => _pedirFoto(_fotos.elegirDeGaleria);
 
   Future<void> _pedirFoto(Future<ResultadoFoto> Function() pedir) async {
-    if (_pidiendoFoto) return;
+    if (_pidiendoFoto || _guardando) return;
     _pidiendoFoto = true;
     _avisoFoto = null;
     _avisar();
@@ -108,12 +124,68 @@ class NuevoReporteViewModel extends ChangeNotifier {
           'dirá dónde está el punto.'
       : null;
 
+  /// HU-03 · «Falta la foto»: se dice qué falta, junto a la foto.
+  String? get errorFoto => _intentoGuardar && !tieneFoto
+      ? 'Falta la foto. Tómala o elígela de la galería.'
+      : null;
+
   /// Marca el intento de guardar y dice si el formulario está completo.
-  /// Lo usa `guardar()` (HU-03) antes de escribir nada.
   bool validar() {
     _intentoGuardar = true;
     _avisar();
-    return !faltaReferencia;
+    return tieneFoto && !faltaReferencia;
+  }
+
+  // ---------------------------------------------------------------- HU-03
+  bool _guardando = false;
+  String? _errorGuardado;
+
+  /// Hay un guardado en curso (o ya terminó bien): los botones se apagan.
+  bool get guardando => _guardando;
+
+  /// Por qué no se pudo guardar, en lenguaje llano.
+  String? get errorGuardado => _errorGuardado;
+
+  /// Guarda el reporte en el teléfono. Devuelve el reporte guardado, o
+  /// nulo si no se guardó (falta algo, no hubo espacio, la base falló).
+  ///
+  /// No necesita conexión: todo pasa dentro del teléfono.
+  Future<Reporte?> guardar() async {
+    // HU-03 · «Doble toque»: el segundo toque llega con _guardando en
+    // verdadero y no hace nada. Se crea un solo reporte.
+    if (_guardando) return null;
+    if (!validar()) return null;
+
+    _guardando = true;
+    _errorGuardado = null;
+    _avisar();
+
+    String? rutaPermanente;
+    try {
+      rutaPermanente = await _almacen.guardarPermanente(_rutaFoto!);
+      final Reporte reporte = await _repositorio.guardar(
+        BorradorReporte(
+          fecha: _reloj(),
+          referencia: _referencia.trim(),
+          rutaFoto: rutaPermanente,
+        ),
+      );
+      // Queda en «guardando» a propósito: la pantalla se va a cerrar y
+      // ningún toque más debe volver a guardar.
+      return reporte;
+    } on SinEspacio {
+      // HU-03 · «Sin espacio»: el formulario conserva foto y referencia.
+      _errorGuardado = 'No hay espacio suficiente en el teléfono para '
+          'guardar la foto. Libera espacio y vuelve a intentarlo: tu foto '
+          'y lo que escribiste siguen aquí.';
+    } catch (e) {
+      debugPrint('No se pudo guardar el reporte: $e');
+      if (rutaPermanente != null) await _almacen.borrar(rutaPermanente);
+      _errorGuardado = 'No se pudo guardar el reporte. Vuelve a intentarlo.';
+    }
+    _guardando = false;
+    _avisar();
+    return null;
   }
 
   // ------------------------------------------------------------ comunes
