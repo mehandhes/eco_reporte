@@ -77,6 +77,45 @@ class NuevoReporteViewModel extends ChangeNotifier {
     }
   }
 
+  // ---------------------------------------------------------------- HU-12
+  /// Límite de la referencia. Cabe en una línea de WhatsApp y en el
+  /// listado de la JAC.
+  static const int maxReferencia = 120;
+
+  String _referencia = '';
+
+  /// Se vuelve verdadero la primera vez que se intenta guardar: desde ahí
+  /// el formulario señala lo que falta (no antes, para no regañar a quien
+  /// apenas está empezando).
+  bool _intentoGuardar = false;
+
+  String get referencia => _referencia;
+  set referencia(String valor) {
+    _referencia = valor;
+    _avisar();
+  }
+
+  /// HU-12 · Sin ubicación, la referencia es lo único que dirá dónde está
+  /// el punto. Hasta que llegue HU-02 (Sprint 3) el formulario no tiene
+  /// ubicación, así que la referencia es siempre obligatoria.
+  bool get referenciaObligatoria => true;
+
+  bool get faltaReferencia =>
+      referenciaObligatoria && _referencia.trim().isEmpty;
+
+  String? get errorReferencia => _intentoGuardar && faltaReferencia
+      ? 'Escribe una referencia del lugar: sin ubicación, es lo que '
+          'dirá dónde está el punto.'
+      : null;
+
+  /// Marca el intento de guardar y dice si el formulario está completo.
+  /// Lo usa `guardar()` (HU-03) antes de escribir nada.
+  bool validar() {
+    _intentoGuardar = true;
+    _avisar();
+    return !faltaReferencia;
+  }
+
   // ------------------------------------------------------------ comunes
   bool _cerrado = false;
 
