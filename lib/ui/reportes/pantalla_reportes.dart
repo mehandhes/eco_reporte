@@ -74,14 +74,8 @@ class PantallaReportes extends StatelessWidget {
     );
   }
 
-  /// HU-01 todavía no está construida: se avisa en lugar de no hacer nada.
+  /// HU-01 · Abre el formulario «Nuevo reporte».
   void _crearReporte(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('Crear un reporte llega con HU-01 en el Sprint 2.'),
-        ),
-      );
+    context.push('/nuevo');
   }
 }
